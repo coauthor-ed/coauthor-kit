@@ -28,7 +28,7 @@ This guide sets expectations before you spend any time or money.
 
 - **It does not decide what your child should learn.** You do. The outline is where you say what matters.
 - **It does not replace your review.** An AI can write a confident sentence that is wrong. The kit's checks catch broken files and many factual slips, but you are the one who knows the subject and your child.
-- **It is not free to run.** The agent uses an AI model, and a full chapter takes many runs. See [Costs, models and troubleshooting](costs-models-and-troubleshooting).
+- **It is not free to run.** The agent uses an AI model, and a full chapter takes many runs. See [Costs, models and troubleshooting](costs-models-and-troubleshooting.md).
 - **It is not instant.** A chapter is a few evenings of on-and-off work: start a run, review, approve, steer, repeat.
 
 ## The method in six steps
@@ -42,4 +42,4 @@ This guide sets expectations before you spend any time or money.
 
 ## Next
 
-- [Setting up the agent kit](setting-up-the-agent-kit)
+- [Setting up the agent kit](setting-up-the-agent-kit.md)

@@ -64,4 +64,4 @@ Without `--yes` it only shows what it would approve. Approved content stays appr
 2. Review each lesson as soon as it is written, before its simulations are built. Wording fixes are cheap then.
 3. Review the simulations in the lesson preview, where they appear with their slides.
 4. Try the lesson with your child. Note where they got stuck.
-5. Approve, then publish (see [Publishing your course](publishing-your-course)).
+5. Approve, then publish (see [Publishing your course](publishing-your-course.md)).

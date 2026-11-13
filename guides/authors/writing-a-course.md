@@ -20,7 +20,7 @@ The kit splits a chapter into many small runs. Each run does one job, writes its
 | 3. Simulation | simulation | the simulation code, checked and screenshotted |
 | 4. Module | chapter | the module file that ties the lessons together; a full validation |
 
-There are also side stages: **R** (a critique of one lesson that only files notes), **5** (the showcase card for the Discover page, after approval) and **B1-B3** (a question bank; see [Building a question bank](building-a-question-bank)).
+There are also side stages: **R** (a critique of one lesson that only files notes), **5** (the showcase card for the Discover page, after approval) and **B1-B3** (a question bank; see [Building a question bank](building-a-question-bank.md)).
 
 > [!TIP]
 > Read `OUTLINE.md` carefully after stage 1b. It is the cheapest place to change your mind. Moving a slide in the outline costs nothing; rewriting a finished lesson costs a run.
@@ -51,7 +51,7 @@ node tools/staged-generation/orchestrate.mjs --bundle grade9-motion
 
 You can leave directions for a bundle, a lesson, a slide or a single simulation, even one that only exists in the outline so far. The next run for that unit reads them first.
 
-- In the dashboard (see [Preview, review and approve](preview-review-approve)): **Steer generation**.
+- In the dashboard (see [Preview, review and approve](preview-review-approve.md)): **Steer generation**.
 - Or from the command line:
 
 ```bash
@@ -71,4 +71,4 @@ Runs sometimes stop halfway (a usage limit, a network error). Just ask `next.mjs
 
 ## Next
 
-- [Preview, review and approve](preview-review-approve)
+- [Preview, review and approve](preview-review-approve.md)

@@ -43,7 +43,7 @@ Each published course has a `manifest.json`. Its web address is what a parent pa
 2. Paste the manifest address, for example `https://<you>.github.io/my-public-courses/grade9/motion/manifest.json`.
 3. Read the trust warning and choose **Add it**.
 
-See [Adding a course source](adding-a-course-source) for what parents see.
+See [Adding a course source](https://coauthor-ed.github.io/coauthor/#/guides/adding-a-course-source) for what parents see.
 
 ## Updating
 

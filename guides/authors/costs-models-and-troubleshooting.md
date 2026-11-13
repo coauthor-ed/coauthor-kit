@@ -44,7 +44,7 @@ You can use a different model for each stage. Many people use their strongest mo
 
 **A simulation is stuck in "building".** Make sure no agent is still working on it, then ask for it again with `--force-scene <name>`.
 
-**Something looks wrong in the preview.** Take a note on that slide and dispatch it as a fix prompt (see [Preview, review and approve](preview-review-approve)). Do not edit generated files by hand unless the change is tiny.
+**Something looks wrong in the preview.** Take a note on that slide and dispatch it as a fix prompt (see [Preview, review and approve](preview-review-approve.md)). Do not edit generated files by hand unless the change is tiny.
 
 **The doctor reports a problem.** Fix what it names first. `doctor.mjs --selftest` checks that the kit copy itself is sound.
 

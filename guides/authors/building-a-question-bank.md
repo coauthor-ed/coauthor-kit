@@ -43,8 +43,8 @@ Every question marked **hard** gets a full worked solution, not a one-line expla
 
 ## Descriptive questions
 
-For subjects with long answers (history, civics, geography, economics, and proofs in maths), the bank uses descriptive questions marked point by point, like a CBSE marking scheme: a 3 mark question gets 3 points. Your child's view of these is explained in [Answering descriptive questions](answering-descriptive-questions).
+For subjects with long answers (history, civics, geography, economics, and proofs in maths), the bank uses descriptive questions marked point by point, like a CBSE marking scheme: a 3 mark question gets 3 points. Your child's view of these is explained in [Answering descriptive questions](https://coauthor-ed.github.io/coauthor/#/guides/answering-descriptive-questions).
 
 ## Next
 
-- [Preview, review and approve](preview-review-approve)
+- [Preview, review and approve](preview-review-approve.md)

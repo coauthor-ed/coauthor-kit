@@ -64,8 +64,8 @@ The first prompt looks like this:
 Read START-HERE.md and follow it. Stage: 1a. Bundle: grade9-motion. Target: FIGURES.md.
 ```
 
-Paste it into the agent and let it work. When it finishes, it writes a short report. Then you ask the kit for the next prompt. [Writing a course](writing-a-course) explains the stages.
+Paste it into the agent and let it work. When it finishes, it writes a short report. Then you ask the kit for the next prompt. [Writing a course](writing-a-course.md) explains the stages.
 
 ## Next
 
-- [Writing a course](writing-a-course)
+- [Writing a course](writing-a-course.md)

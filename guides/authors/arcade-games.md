@@ -15,7 +15,7 @@ An arcade game is a short practice break inside a lesson: a minute or two of qui
 
 You do not write game code. You write a **deck**: a small data file with the groups, items and reasons. The kit turns it into a game.
 
-![The menu screen of the Catch game in its ice look: Quill stands on the ice with a basket, and a panel explains which fractions to catch.](media/arcade-catch.png "Catch, ice look. The deck is a list of fractions in groups.")
+![The menu screen of the Catch game in its ice look: Quill stands on the ice with a basket, and a panel explains which fractions to catch.](../media/arcade-catch.png "Catch, ice look. The deck is a list of fractions in groups.")
 
 ## The six kinds of game
 
@@ -28,7 +28,7 @@ You do not write game code. You write a **deck**: a small data file with the gro
 | put steps or sizes in order | Order | a tower, or a train |
 | call statements true or false | Judge | swipe a card, or open a door |
 
-![The menu screen of a Judge game: science claims are shown one at a time, and the learner calls each one a myth or a fact.](media/arcade-judge.png "Judge, with a deck of science myths.")
+![The menu screen of a Judge game: science claims are shown one at a time, and the learner calls each one a myth or a fact.](../media/arcade-judge.png "Judge, with a deck of science myths.")
 
 ## Same deck, different games
 
@@ -47,7 +47,7 @@ export const FRACTION_FORMS = {
 };
 ```
 
-The very same deck drives a **Catch** game: a sign shows one group ("Catch 1/2"), and the learner keeps the items that belong and lets the others fall. Using Sort in one lesson and Catch in the next gives variety without any new writing. Quill's Catch on the [welcome page](#/welcome) is exactly this.
+The very same deck drives a **Catch** game: a sign shows one group ("Catch 1/2"), and the learner keeps the items that belong and lets the others fall. Using Sort in one lesson and Catch in the next gives variety without any new writing. Quill's Catch on the [welcome page](https://coauthor-ed.github.io/coauthor/#/welcome) is exactly this.
 
 > [!TIP]
 > Write each `why` as evidence, not as the answer again. "It is high up: its position stores energy" teaches. "It is potential energy" does not.
@@ -71,5 +71,5 @@ Games work with a mouse, a finger or the keyboard: Tab to the game, Enter to sta
 
 ## Next
 
-- [Writing a course](writing-a-course)
-- [Preview, review and approve](preview-review-approve)
+- [Writing a course](writing-a-course.md)
+- [Preview, review and approve](preview-review-approve.md)
