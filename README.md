@@ -38,6 +38,21 @@ Operator cheat sheet: `for-the-human-operator.txt`. Agent rules: `AGENTS.md`.
 | `simulations-kit/` | scene helper library and vendored libraries |
 | `.agents/`, `.devcontainer/` | agent skill; Codespaces setup |
 
+## Guides for authors
+
+Plain-language guides for the people running the kit (not read by agents), in `guides/authors/`:
+
+- [Setting up the agent kit](guides/authors/setting-up-the-agent-kit.md)
+- [What the agent kit does](guides/authors/what-the-agent-kit-does.md)
+- [Writing a course](guides/authors/writing-a-course.md)
+- [Building a question bank](guides/authors/building-a-question-bank.md)
+- [Arcade games](guides/authors/arcade-games.md)
+- [Preview, review, approve](guides/authors/preview-review-approve.md)
+- [Publishing your course](guides/authors/publishing-your-course.md)
+- [Costs, models and troubleshooting](guides/authors/costs-models-and-troubleshooting.md)
+
+The same guides are in the live app: https://coauthor-ed.github.io/coauthor/#/guides
+
 ## Licence
 
 - Code and docs: MIT (`LICENSE`).

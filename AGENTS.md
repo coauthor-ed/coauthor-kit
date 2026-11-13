@@ -67,6 +67,7 @@ Under staged generation (`docs/staged-generation.md`), `FIGURES.md` is written i
 16. Games over the field guide (`field-guide.json`, `simulations/base/kit/*Scene.js`) follow `docs/games.md`: one data file, thin subclasses, evidence decides and lures never do. Run `node tools/field-guide-lint.mjs courses/<bundle>` after any edit to the guide or a game scene.
 
 17. A narrated course (OUTLINE header `Narration: narrated`) follows `docs/narration.md` from Stage 1b on (sec 13: prologue, narration-ready stubs and scenes), and gets one Stage N run per lesson (`briefs/stageN-narration.md`). Run `node tools/narration-lint.mjs --bundle <bundle> <L0N>` before any audio.
+18. `guides/` is for human readers (also shown in the live app); agents do not read it.
 
 ## What you don't have here
 
