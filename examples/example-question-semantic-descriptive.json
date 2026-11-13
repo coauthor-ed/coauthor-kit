@@ -1,0 +1,122 @@
+{
+  "id": "q-democracy-features",
+  "type": "semantic-descriptive@1",
+  "difficulty": "medium",
+  "bloomLevel": "understand",
+  "prompt": {
+    "en": "State any three features of democracy."
+  },
+  "rubric": [
+    {
+      "id": "elected-rulers",
+      "label": {
+        "en": "Rulers are chosen by the people through elections"
+      },
+      "level1": {
+        "en": "Think about who gets to decide who runs the country, and how they're chosen."
+      },
+      "clue": {
+        "en": "The final decision-makers hold their position because citizens voted them into it - not by birth or force."
+      },
+      "level2Template": {
+        "en": "In a democracy, the country's rulers are chosen by the people through ___."
+      },
+      "accepted": [
+        "elections",
+        "free and fair elections",
+        "voting",
+        "the people electing them"
+      ]
+    },
+    {
+      "id": "one-person-one-vote",
+      "label": {
+        "en": "Every adult citizen's vote carries equal value"
+      },
+      "level1": {
+        "en": "Does a wealthier or more powerful citizen's vote count for more?"
+      },
+      "clue": {
+        "en": "One person, one vote, one value - a labourer's ballot and a minister's ballot are weighed exactly the same."
+      },
+      "level2Template": {
+        "en": "This choice and opportunity to vote must be available to all people on an ___ basis."
+      },
+      "accepted": [
+        "equal",
+        "equal basis",
+        "one person one vote one value",
+        "universal adult suffrage"
+      ]
+    },
+    {
+      "id": "rule-of-law",
+      "label": {
+        "en": "Government is limited by the constitution and citizens' basic rights"
+      },
+      "level1": {
+        "en": "Can an elected government do absolutely anything it wants once in power?"
+      },
+      "clue": {
+        "en": "Even an elected government must act within limits set by a country's constitution and must respect people's basic rights."
+      },
+      "level2Template": {
+        "en": "A democratic government's power is limited by the ___ and the basic rights of citizens."
+      },
+      "accepted": [
+        "constitution",
+        "constitutional limits",
+        "rule of law",
+        "fundamental rights"
+      ]
+    }
+  ],
+  "level3": [
+    {
+      "eyebrow": {
+        "en": "Setting the scene"
+      },
+      "text": {
+        "en": "Democracy is defined by a handful of core features working together, not any single one alone."
+      },
+      "rubricId": null
+    },
+    {
+      "eyebrow": {
+        "en": "First feature"
+      },
+      "text": {
+        "en": "The country's rulers are chosen by the people through ___."
+      },
+      "rubricId": "elected-rulers"
+    },
+    {
+      "eyebrow": {
+        "en": "Second feature"
+      },
+      "text": {
+        "en": "This choice and opportunity to vote must be available to all citizens on an ___ basis."
+      },
+      "rubricId": "one-person-one-vote"
+    },
+    {
+      "eyebrow": {
+        "en": "Third feature"
+      },
+      "text": {
+        "en": "And the government's own power is limited by the ___ and the basic rights of citizens."
+      },
+      "rubricId": "rule-of-law"
+    }
+  ],
+  "thresholds": {
+    "high": 0.6,
+    "low": 0.4,
+    "blank": 0.78
+  },
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

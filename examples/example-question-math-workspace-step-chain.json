@@ -1,0 +1,168 @@
+{
+  "id": "q-example-mw-step-chain",
+  "type": "math-workspace@1",
+  "difficulty": "medium",
+  "bloomLevel": "apply",
+  "stem": {
+    "en": "Solve $x^2 - 5x + 6 = 0$."
+  },
+  "marks": 3,
+  "mode": "coach",
+  "topic": "quadratics",
+  "vars": [
+    "x"
+  ],
+  "parts": [
+    {
+      "id": "p1",
+      "shape": "step-chain",
+      "label": {
+        "en": "Working"
+      },
+      "start": "x^2-5x+6=0",
+      "goal": {
+        "form": "solved-for",
+        "var": "x",
+        "solutions": [
+          "2",
+          "3"
+        ]
+      },
+      "milestones": [
+        {
+          "latex": "(x-2)(x-3)=0",
+          "label": {
+            "en": "Factorised"
+          },
+          "weight": 1
+        }
+      ],
+      "modelSolution": [
+        "(x-2)(x-3)=0",
+        "x-2=0 \\lor x-3=0",
+        "x=2 \\lor x=3"
+      ],
+      "moves": [
+        [
+          {
+            "label": {
+              "en": "Factorise the left side"
+            },
+            "result": "(x-2)(x-3)=0",
+            "correct": true,
+            "why": {
+              "en": "-2 and -3 multiply to 6 and add to -5."
+            }
+          },
+          {
+            "label": {
+              "en": "Factorise with plus signs"
+            },
+            "result": "(x+2)(x+3)=0",
+            "correct": false,
+            "why": {
+              "en": "(x+2)(x+3) expands to x^2 + 5x + 6. The middle term has the wrong sign."
+            }
+          },
+          {
+            "label": {
+              "en": "Move 6 to the right"
+            },
+            "result": "x(x-5)=-6",
+            "correct": false,
+            "why": {
+              "en": "This is true, but it does not help. A product equal to -6 tells us nothing about each factor."
+            }
+          }
+        ],
+        [
+          {
+            "label": {
+              "en": "Set each factor to zero"
+            },
+            "result": "x-2=0 \\lor x-3=0",
+            "correct": true,
+            "why": {
+              "en": "If a product is zero, at least one of the factors is zero."
+            }
+          },
+          {
+            "label": {
+              "en": "Set each factor to one"
+            },
+            "result": "x-2=1 \\lor x-3=1",
+            "correct": false,
+            "why": {
+              "en": "Only zero works this way. Two numbers can multiply to 0 only if one of them is 0."
+            }
+          }
+        ],
+        [
+          {
+            "label": {
+              "en": "Solve each small equation"
+            },
+            "result": "x=2 \\lor x=3",
+            "correct": true,
+            "why": {
+              "en": "Add 2 to both sides of the first, and 3 to both sides of the second."
+            }
+          },
+          {
+            "label": {
+              "en": "Change the signs"
+            },
+            "result": "x=-2 \\lor x=-3",
+            "correct": false,
+            "why": {
+              "en": "Put x = -2 back into x - 2 = 0: you get -4, not 0."
+            }
+          }
+        ]
+      ],
+      "hints": [
+        {
+          "step": 0,
+          "strategy": {
+            "en": "Find two numbers that multiply to 6 and add to -5."
+          },
+          "template": "(x-\\placeholder{})(x-\\placeholder{})=0"
+        },
+        {
+          "step": 1,
+          "strategy": {
+            "en": "If a product is zero, at least one factor must be zero."
+          },
+          "template": "x-\\placeholder{}=0 \\lor x-\\placeholder{}=0"
+        },
+        {
+          "step": 2,
+          "strategy": {
+            "en": "Solve each small equation on its own."
+          },
+          "template": "x=\\placeholder{} \\lor x=\\placeholder{}"
+        }
+      ],
+      "maxSteps": 6,
+      "visual": {
+        "kind": "parabola",
+        "params": {
+          "a": 1,
+          "b": -5,
+          "c": 6
+        }
+      }
+    }
+  ],
+  "explanation": {
+    "en": "$(x-2)(x-3)=0$, so $x-2=0$ or $x-3=0$, which gives $x=2$ or $x=3$."
+  },
+  "tags": [
+    "quadratic-equation",
+    "factorisation",
+    "zero-product"
+  ],
+  "authoring": {
+    "status": "ai-draft"
+  }
+}

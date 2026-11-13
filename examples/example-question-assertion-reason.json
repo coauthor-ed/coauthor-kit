@@ -1,0 +1,30 @@
+{
+  "id": "q-metals-conduction",
+  "type": "assertion-reason@1",
+  "difficulty": "medium",
+  "bloomLevel": "analyze",
+  "assertion": {
+    "en": "Metals are good conductors of electricity."
+  },
+  "reason": {
+    "en": "Metals have free (delocalized) electrons that can move through the metallic lattice and carry charge."
+  },
+  "correctOptionId": "a",
+  "optionFeedback": {
+    "b": { "en": "Both statements are true here - look again at whether the free electrons actually explain why metals conduct." },
+    "c": { "en": "The Reason is true, not false - metals really do have free electrons that can move through the lattice." },
+    "d": { "en": "The Assertion is true, not false - metals are in fact good conductors of electricity." }
+  },
+  "explanation": {
+    "en": "R correctly explains A: it's exactly the sea of free electrons in the metallic lattice, not bound to individual atoms, that carries charge - which is why metals conduct."
+  },
+  "hints": [
+    { "en": "Ask separately: is each statement true on its own, and only then whether the second explains the first." }
+  ],
+  "tags": ["metals", "electrical-conductivity"],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

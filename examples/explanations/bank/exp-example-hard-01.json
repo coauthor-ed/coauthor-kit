@@ -1,0 +1,12 @@
+{
+  "id": "exp-example-hard-01",
+  "type": "content-block@1",
+  "markdown": {
+    "en": "**Step 1 - free-body equations.** Both masses share magnitude *a* (inextensible string) and tension *T* (light, frictionless string). Heavier mass (6 kg) accelerates down; lighter (4 kg) accelerates up.\n\n6g - T = 6a\n\nT - 4g = 4a"
+  },
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

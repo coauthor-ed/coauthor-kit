@@ -1,0 +1,15 @@
+{
+  "id": "blk-l01-s01",
+  "type": "content-block@1",
+  "markdownRef": "blocks/L01/blk-l01-s01.md",
+  "simulation": {
+    "src": "simulations/L01/PlaygroundTracksIntroScene.js",
+    "position": "below"
+  },
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-10-13T01:25:03.101Z",
+    "reviewedBy": "review-bar"
+  }
+}

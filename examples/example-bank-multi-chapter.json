@@ -1,0 +1,33 @@
+{
+  "id": "bank-grade9-sst-practice",
+  "type": "question-bank@1",
+  "subject": "social-science",
+  "grade": 9,
+  "chapterIds": ["shaping-earth-surface", "democracy"],
+  "title": {
+    "en": "Grade 9 Social Science - Practice Question Bank"
+  },
+  "questions": [
+    {
+      "ref": "questions/bank/q-bank-001.json",
+      "type": "mcq-single@2",
+      "topicId": "earth-interior-layers",
+      "difficulty": "easy",
+      "weight": 1,
+      "estimatedTimeSec": 75
+    },
+    {
+      "ref": "questions/bank/q-bank-038.json",
+      "type": "semantic-descriptive@1",
+      "topicId": "democracy-origins-principles",
+      "difficulty": "medium",
+      "weight": 2,
+      "estimatedTimeSec": 120
+    }
+  ],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

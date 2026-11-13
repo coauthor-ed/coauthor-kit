@@ -1,0 +1,30 @@
+{
+  "id": "q-tiled-rectangles",
+  "type": "numeric-value@1",
+  "difficulty": "hard",
+  "bloomLevel": "apply",
+  "stem": {
+    "en": "Nine identical rectangles are arranged in a 3×3 grid to form one large rectangle. Each small rectangle is twice as long as it is wide. If the area of the large rectangle is 72 cm², find the perimeter of one small rectangle, in cm."
+  },
+  "expectedValue": 12,
+  "tolerance": 0.1,
+  "unit": "cm",
+  "explanation": {
+    "en": "Let each small rectangle be w wide and 2w long. The large rectangle is 3w by 6w, area 18w² = 72, so w = 2, length = 4. Perimeter of one small rectangle = 2(2+4) = 12 cm."
+  },
+  "hints": [
+    {
+      "en": "Write the large rectangle's width and height in terms of one small rectangle's width w, using the 3×3 grid and the 1:2 side ratio."
+    }
+  ],
+  "tags": [
+    "tiling",
+    "area",
+    "perimeter"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-08-16T00:00:00.000Z"
+  }
+}

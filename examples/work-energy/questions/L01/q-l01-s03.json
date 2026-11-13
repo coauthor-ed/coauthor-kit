@@ -1,0 +1,59 @@
+{
+  "id": "q-l01-s03",
+  "type": "mcq-single@2",
+  "difficulty": "medium",
+  "bloomLevel": "analyse",
+  "stem": {
+    "en": "A ball strikes a goalkeeper's gloves and is stopped dead. The goalkeeper's hands are driven backwards by the ball, and the ball is moving forwards throughout the contact. Which row is correct?"
+  },
+  "options": [
+    {
+      "id": "a",
+      "text": {
+        "en": "The goalkeeper does negative work on the ball, and the ball does positive work on the goalkeeper's hands."
+      },
+      "isCorrect": true
+    },
+    {
+      "id": "b",
+      "text": {
+        "en": "The goalkeeper does positive work on the ball, and the ball does positive work on the goalkeeper's hands."
+      },
+      "isCorrect": false
+    },
+    {
+      "id": "c",
+      "text": {
+        "en": "Both do zero work, because the contact between hand and ball lasts only a fraction of a second."
+      },
+      "isCorrect": false
+    },
+    {
+      "id": "d",
+      "text": {
+        "en": "Both do zero work, because Newton's third law says the two equal forces cancel each other out."
+      },
+      "isCorrect": false
+    }
+  ],
+  "correctOptionId": "a",
+  "explanation": {
+    "en": "The forces on the ball and on the hands are equal and opposite, so they cancel as forces - but work is a product, and the two products have different factors. The goalkeeper's force is opposite to the ball's displacement, giving negative work. The ball's force on the hands is along the hands' displacement, giving positive work."
+  },
+  "hints": [
+    {
+      "en": "Equal and opposite forces do not mean equal and opposite works. Work is force times the displacement along that force, and the two objects are displaced in opposite directions."
+    }
+  ],
+  "tags": [
+    "work",
+    "sign-of-work",
+    "newton-third-law"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-10-13T01:26:30.058Z",
+    "reviewedBy": "review-bar"
+  }
+}

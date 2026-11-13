@@ -1,0 +1,17 @@
+{
+  "id": "blk-l04-s01",
+  "type": "content-block@1",
+  "markdown": {
+    "en": "## The Leap to Urban Splendour\n\nThe cities of the **Sindhu-Sarasvatī Civilisation** did not appear overnight.\n\nAt Pre-Harappan sites like **Bhirrana** and **Kunal** in Haryana (dating back to 7000-5500 BCE), communities had already developed distinctive painted pottery, terracotta figurines, and bead-making industries.\n\nBy 2600 BCE, these regional cultures unified into a mature urban civilisation stretching over 1.5 million square kilometres.\n\n**Harappan engineers planned their cities on a strict orthogonal grid, dividing settlements into a fortified western Citadel and an expansive Lower Town.**"
+  },
+  "simulation": {
+    "src": "simulations/L04/HarappanUrbanGrowthScene.js",
+    "position": "right"
+  },
+  "mediaStep": 0,
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

@@ -1,0 +1,24 @@
+Photos for examples/blocks/blk-example-photo-diagram.json (docs/photo-diagrams.md worked example)
+
+flowering-plant.jpg
+Source: Wikimedia Commons, File:Red hibiscus closeup 2.jpg
+URL: https://commons.wikimedia.org/wiki/File:Red_hibiscus_closeup_2.jpg
+Original file: https://upload.wikimedia.org/wikipedia/commons/5/5f/Red_hibiscus_closeup_2.jpg
+Author: Pratishkhedekar
+License: CC BY-SA 4.0 International, https://creativecommons.org/licenses/by-sa/4.0/
+
+pollinator.jpg
+Source: Wikimedia Commons, File:Honey bee on oregano flower.jpg
+URL: https://commons.wikimedia.org/wiki/File:Honey_bee_on_oregano_flower.jpg
+Original file: https://upload.wikimedia.org/wikipedia/commons/c/c2/Honey_bee_on_oregano_flower.jpg
+Author: Conall (Flickr: conall)
+License: CC BY 4.0 International, https://creativecommons.org/licenses/by/4.0/
+
+decomposers.jpg
+Source: Wikimedia Commons, File:Natural wild mushrooms growing on a forest floor during monsoon.jpg
+URL: https://commons.wikimedia.org/wiki/File:Natural_wild_mushrooms_growing_on_a_forest_floor_during_monsoon.jpg
+Original file: https://upload.wikimedia.org/wikipedia/commons/9/96/Natural_wild_mushrooms_growing_on_a_forest_floor_during_monsoon.jpg
+Author: Satarker samiksha
+License: CC0 (public domain dedication)
+
+Same three photos already used (and credited) in courses/diversity/media/L01/ - reused here as this format's worked example, not a separate sourcing pass. Resized/re-compressed for PWA delivery, centre-cropped to square 360x360.

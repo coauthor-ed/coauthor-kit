@@ -1,0 +1,1155 @@
+import { CanvasSimulation } from 'simulations/base/CanvasSimulation.js';
+import { SimDraw } from 'simulations/base/SimDrawUtils.js';
+import { readSimColors } from 'simulations/base/SimTheme.js';
+import { clamp01, cruise, lerp } from 'simulations/base/SimMotion.js';
+
+const W = 800;
+const H = 500;
+
+const COLOR_TOKEN_MAP = {
+  bgDeep: ['--sim-bg-deep', '#060a14'],
+  panelBg: ['--sim-bg-surface', '#0f172a'],
+  label: ['--sim-label', '#f1f5f9'],
+  muted: ['--sim-label-muted', '#94a3b8'],
+  bakedBrick: ['--sim-brick', '#c2410c'],
+  citadelGold: ['--sim-citadel', '#f59e0b'],
+  drainCyan: ['--sim-drain', '#06b6d4'],
+  terracotta: ['--sim-terracotta', '#b45309'],
+  riverBlue: ['--sim-river', '#0284c7'],
+  greatBathAqua: ['--sim-bath', '#0ea5e9']
+};
+
+const STAGES = [
+  {
+    type: 'spectrum',
+    shortTitle: '1. Urban Growth Panorama',
+    title: 'The Leap to Urban Splendour (7000-2600 BCE)',
+    caption: '1. Urban Leap: Over millennia, rural farming villages along the Indus and Sarasvati evolved into planned brick metropolises.',
+    desc: 'From circular pit dwellings to monumental multi-acre brick complexes housing over 40,000 citizens.',
+    card: {
+      tag: 'STAGE 1 OF 4',
+      title: 'URBAN EVOLUTION',
+      subtitle: 'From Villages to Metropolis',
+      sections: [
+        {
+          heading: 'MILLENNIA OF INDIGENOUS GROWTH',
+          colorKey: 'warning',
+          text: 'The Sarasvatī-Sindhu civilization was not an overnight import, but the organic culmination of 5,000 years of regional farming development.'
+        },
+        {
+          heading: '3 DISTINCT PHASES',
+          colorKey: 'accent',
+          text: 'Pre-Harappan (7000-3300 BCE) ➔ Early Harappan (3300-2600 BCE) ➔ Mature Harappan (2600-1900 BCE).'
+        },
+        {
+          heading: 'CONTINENTAL BREADTH',
+          colorKey: 'success',
+          text: 'Encompassed over 1.5 million square kilometres across northwestern India and Pakistan with over 1,500 recorded sites.'
+        }
+      ],
+      didYouKnow: 'Over 60% of all discovered Harappan sites are clustered along the dry bed of the ancient Sarasvatī (Ghaggar-Hakra) river.'
+    }
+  },
+  {
+    type: 'preHarappan',
+    shortTitle: '2. Pre-Harappan Roots',
+    title: 'Pre-Harappan Roots: Bhirrana & Kunal (7000-5500 BCE)',
+    caption: '2. Early Craft Mastery: At Bhirrana and Kunal (Haryana), communities crafted painted Hakra ware, silver tiaras, and micro-beads.',
+    desc: 'Proves the deep indigenous antiquity of Harappan craftsmanship thousands of years prior to city building.',
+    card: {
+      tag: 'STAGE 2 OF 4',
+      title: 'PRE-HARAPPAN ROOTS',
+      subtitle: 'Bhirrana & Kunal (Haryana)',
+      sections: [
+        {
+          heading: 'BHIRRANA HAKRA WARE',
+          colorKey: 'warning',
+          text: 'Excavated in Fatehabad, Haryana, with radiocarbon dates extending to ~7000-5500 BCE, confirming early settled life.'
+        },
+        {
+          heading: 'DANCING GIRL GRAFFITI',
+          colorKey: 'accent',
+          text: 'A potsherd from Bhirrana features incised graffiti of a dancing girl with hand on hip, pre-dating the Mohenjo-daro bronze statue.'
+        },
+        {
+          heading: 'KUNAL ROYAL REGALIA',
+          colorKey: 'success',
+          text: 'Two royal silver tiaras (crowns) and 12,000 semi-precious beads found at Kunal reveal advanced early metallurgical mastery.'
+        }
+      ],
+      didYouKnow: 'The silver tiaras at Kunal are the oldest known precious metal crowns in the entire Indian subcontinent.'
+    }
+  },
+  {
+    type: 'matureMap',
+    shortTitle: '3. 1:2:4 Brick Metrology',
+    title: 'Mature Harappan Standardization & Metrology (2600 BCE)',
+    caption: '3. Continental Standards: All cities across 1.5 million km² adopted the exact 1:2:4 brick ratio and binary chert weights.',
+    desc: 'Interlocking header-and-stretcher Harappan brick bonding provided unparalleled structural resilience against floods and earthquakes.',
+    card: {
+      tag: 'STAGE 3 OF 4',
+      title: 'BRICK METROLOGY',
+      subtitle: 'Standardized 1:2:4 Proportion',
+      sections: [
+        {
+          heading: 'UNIVERSAL RATIO (1 : 2 : 4)',
+          colorKey: 'warning',
+          text: 'Whether baked in kilns or sun-dried, standard bricks maintained the ratio of 7cm height : 14cm width : 28cm length.'
+        },
+        {
+          heading: 'INTERLOCKING ENGLISH BOND',
+          colorKey: 'accent',
+          text: 'Alternating courses of headers and stretchers locked walls together, preventing vertical shear cracks during monsoons and quakes.'
+        },
+        {
+          heading: 'KILN-BURNT RESILIENCE',
+          colorKey: 'success',
+          text: 'Fired bricks lined all baths, drains, and city walls, resisting moisture decay across four and a half millennia.'
+        }
+      ],
+      didYouKnow: 'The 1:2:4 brick ratio is so geometrically perfect that modern civil engineers still use this exact proportion today!'
+    }
+  },
+  {
+    type: 'dualCity',
+    shortTitle: '4. 3D Metropolis Plan',
+    title: '3D Dual Metropolis: Citadel, Granaries & Lower Town Grid',
+    caption: '4. Master Town Planning: Western fortified Citadel (Great Bath & Granaries) and Eastern Lower Town (grid houses & covered drains).',
+    desc: 'Mastery of civic architecture: 12m elevated Citadel platform, ventilated granary air ducts, 9m-wide avenues, and continuous covered sewer lines.',
+    card: {
+      tag: 'STAGE 4 OF 4',
+      title: 'DUAL TOWN PLANNING',
+      subtitle: 'Citadel & Lower Town Grid',
+      sections: [
+        {
+          heading: 'WESTERN ELEVATED CITADEL',
+          colorKey: 'warning',
+          text: 'Built atop a 12-metre-high mud-brick podium to safeguard public institutions (Great Bath, Granary, Assembly Hall) from floods.'
+        },
+        {
+          heading: 'EASTERN ORTHOGONAL LOWER TOWN',
+          colorKey: 'accent',
+          text: 'Residential quarters mapped on a strict cardinal grid (north-south, east-west), divided into neat rectangular blocks.'
+        },
+        {
+          heading: 'UNDERGROUND SEWER NETWORK',
+          colorKey: 'success',
+          text: 'Every single private house connected to covered street drains with limestone inspection sumps-unmatched in antiquity.'
+        }
+      ],
+      didYouKnow: 'No other ancient civilization-not even Egypt or Mesopotamia-possessed a universal underground urban sewage network.'
+    }
+  }
+];
+
+const BEAT_STEP_MAP = [
+  [{ idx: 0, dwellMs: null }],
+  [{ idx: 1, dwellMs: null }],
+  [{ idx: 2, dwellMs: null }],
+  [{ idx: 3, dwellMs: null }]
+];
+
+export class HarappanUrbanGrowthScene extends CanvasSimulation {
+  static WIDTH = W;
+  static HEIGHT = H;
+  static ARIA_LABEL = 'High-detail 3D architectural plan of a Harappan metropolis showing the elevated western Citadel with the Great Bath and Granary, and the expansive eastern Lower Town with grid houses and covered drains.';
+
+  static CONTROLS = [
+    { type: 'button', id: 'prev', label: '← Back' },
+    { type: 'button', id: 'next', label: 'Next ->' },
+    { type: 'select', id: 'stageSelect', label: 'Urban Phase:', options: [
+      { id: '0', label: '1. Urban Growth Panorama' },
+      { id: '1', label: '2. Pre-Harappan Roots (Bhirrana)' },
+      { id: '2', label: '3. 1:2:4 Brick Metrology' },
+      { id: '3', label: '4. 3D Dual Metropolis Plan' }
+    ], value: '0' },
+    { type: 'button', id: 'brickBtn', label: '🧱 Stack Brick Course' },
+    { type: 'button', id: 'drainBtn', label: '💧 Simulate Drain Flow' }
+  ];
+
+  constructor(container, config) {
+    super(container, config);
+    this.allowResume = true;
+    this.stepIndex = 0;
+    this._stepEnterTime = 0;
+    this.selectedStage = 0;
+    this._lessonLinked = false;
+    this._actionAnimTime = 0;
+    this._brickBondCount = 2;
+  }
+
+  async setup() {
+    await super.setup();
+    this._canvas.setAttribute('role', 'img');
+    this._canvas.setAttribute('aria-label', this.constructor.ARIA_LABEL);
+    this._reloadColors();
+    this._drawInitialFrame(this._ctx);
+  }
+
+  _reloadColors() {
+    this.colors = readSimColors(this.container, COLOR_TOKEN_MAP);
+  }
+
+  _isDark() {
+    if (typeof document !== 'undefined') {
+      const rootTheme = document.documentElement.getAttribute('data-theme');
+      if (rootTheme === 'light') return false;
+      if (rootTheme === 'dark') return true;
+    }
+    const hex = this.colors?.bgDeep || '#060a14';
+    if (hex.startsWith('#') && hex.length === 7) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return (r * 0.299 + g * 0.587 + b * 0.114) < 128;
+    }
+    return true;
+  }
+
+  _isBeatLocked() {
+    return this._lessonLinked && this.stepIndex < 3;
+  }
+
+  isControlHidden(id) {
+    const locked = this._isBeatLocked();
+    const curr = this.selectedStage !== undefined ? this.selectedStage : this.stepIndex;
+    if (id === 'prev') return locked || this.stepIndex === 0;
+    if (id === 'next') return locked || this.stepIndex >= 3;
+    if (id === 'stageSelect') return this.stepIndex < 3;
+    if (id === 'brickBtn') return curr !== 2;
+    if (id === 'drainBtn') return curr !== 3;
+    return false;
+  }
+
+  onBeatChange(beatIndex) {
+    this._lessonLinked = true;
+    const clamped = Math.max(0, Math.min(beatIndex, BEAT_STEP_MAP.length - 1));
+    this.selectedStage = clamped;
+    this._jumpToStep(BEAT_STEP_MAP[clamped][0].idx);
+  }
+
+  _jumpToStep(i) {
+    this.stepIndex = Math.max(0, Math.min(STAGES.length - 1, i));
+    this.selectedStage = this.stepIndex;
+    this._stepEnterTime = 0;
+    this._actionAnimTime = 0;
+    this._updateActionButtonLabel();
+    this.requestUiUpdate?.();
+  }
+
+  _updateActionButtonLabel() {
+    const stageIdx = this.selectedStage;
+    if (stageIdx === 2) {
+      this.setControlLabel?.('actionBtn', '🧱 Stack Brick Course');
+    } else if (stageIdx === 3) {
+      this.setControlLabel?.('actionBtn', '💧 Simulate Drain Flow');
+    } else if (stageIdx === 1) {
+      this.setControlLabel?.('actionBtn', '🔍 Inspect Potsherd');
+    } else {
+      this.setControlLabel?.('actionBtn', '⚡ Fast-Forward Time');
+    }
+  }
+
+  onControlChange(id, value) {
+    if (id === 'next') {
+      this._jumpToStep(this.stepIndex + 1);
+    } else if (id === 'prev') {
+      this._jumpToStep(this.stepIndex - 1);
+    } else if (id === 'stageSelect') {
+      const idx = Number(value);
+      if (!isNaN(idx) && idx >= 0 && idx < STAGES.length) {
+        this.selectedStage = idx;
+        this.stepIndex = idx;
+      }
+      this._stepEnterTime = 0;
+      this._actionAnimTime = 0;
+      this._updateActionButtonLabel();
+      this.requestUiUpdate?.();
+    } else if (id === 'brickBtn') {
+      this._brickBondCount = (this._brickBondCount % 4) + 1;
+      this._actionAnimTime = 0.001;
+      this.requestUiUpdate?.();
+    } else if (id === 'drainBtn') {
+      this._actionAnimTime = 0.001;
+      this.requestUiUpdate?.();
+    }
+  }
+
+  _tick(ctx, dt) {
+    this._stepEnterTime += dt;
+
+    if (this._actionAnimTime > 0) {
+      this._actionAnimTime += dt;
+      if (this._actionAnimTime > 3.0) {
+        this._actionAnimTime = 0;
+      }
+    }
+
+    ctx.clearRect(0, 0, W, H);
+    const isDark = this._isDark();
+    ctx.fillStyle = isDark ? (this.colors.bgDeep || '#060a14') : '#f8fafc';
+    ctx.fillRect(0, 0, W, H);
+
+    this._drawUrbanStudio(ctx);
+    this._drawCaption(ctx, STAGES[this.stepIndex].caption);
+  }
+
+  _drawInitialFrame(ctx) {
+    this._tick(ctx, 0);
+  }
+
+  _drawUrbanStudio(ctx) {
+    const isDark = this._isDark();
+    const c = this.colors;
+    const t = this._stepEnterTime;
+    const stageIdx = Math.max(0, Math.min(STAGES.length - 1, this.selectedStage || 0));
+    const stage = STAGES[stageIdx];
+
+    // Left Viewport: High-Detail Architectural Canvas
+    const vx = 35, vy = 80, vw = 450, vh = 395;
+    const viewBg = isDark ? '#030712' : '#ffffff';
+    const viewStroke = isDark ? '#334155' : '#cbd5e1';
+    SimDraw.drawPanel(ctx, vx, vy, vw, vh, { bg: viewBg, radius: 12, stroke: viewStroke, lineWidth: 1.5 });
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(vx, vy, vw, vh, 12);
+    ctx.clip();
+
+    // Render corresponding stage view
+    if (stageIdx === 0) {
+      this._drawEvolutionSpectrum(ctx, vx, vy, vw, vh, t, isDark);
+    } else if (stageIdx === 1) {
+      this._drawPreHarappanRoots(ctx, vx, vy, vw, vh, t, isDark);
+    } else if (stageIdx === 2) {
+      this._drawMatureStandardization(ctx, vx, vy, vw, vh, t, isDark);
+    } else {
+      this._drawDualMetropolisPlan(ctx, vx, vy, vw, vh, t, isDark);
+    }
+
+    ctx.restore();
+
+    // Left Viewport Header HUD
+    ctx.save();
+    ctx.font = '700 11px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#f1f5f9' : '#0f172a';
+    ctx.fillText('HARAPPAN URBAN PLANNING', vx + 16, vy + 20);
+
+    ctx.font = '600 11px Inter, system-ui';
+    ctx.fillStyle = stageIdx === 3 ? (isDark ? '#38bdf8' : '#0284c7') : (stageIdx === 2 ? '#f59e0b' : '#ea580c');
+    ctx.textAlign = 'right';
+    ctx.fillText(stage.shortTitle, vx + vw - 16, vy + 20);
+
+    ctx.strokeStyle = isDark ? '#1e293b' : '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(vx + 14, vy + 28);
+    ctx.lineTo(vx + vw - 14, vy + 28);
+    ctx.stroke();
+
+    ctx.restore();
+
+    // Right Side: Standardized Dynamic Context-Aware Pedagogical Card
+    const px = 500, py = 80, pw = 265, ph = 395;
+    this._drawDynamicPedagogicalCard(ctx, px, py, pw, ph, stage, stageIdx, isDark);
+  }
+
+  // -------------------------------------------------------------
+  // 1. DYNAMIC URBAN GROWTH PANORAMA (7000 -> 2600 BCE)
+  // -------------------------------------------------------------
+  _drawEvolutionSpectrum(ctx, vx, vy, vw, vh, t, isDark) {
+    const c = this.colors;
+    ctx.save();
+
+    // Dynamic Atmosphere Sky
+    const skyGrad = ctx.createLinearGradient(vx, vy, vx, vy + vh * 0.55);
+    if (isDark) {
+      skyGrad.addColorStop(0, '#0c1a30');
+      skyGrad.addColorStop(0.5, '#1e293b');
+      skyGrad.addColorStop(1, '#431407');
+    } else {
+      skyGrad.addColorStop(0, '#bae6fd');
+      skyGrad.addColorStop(0.5, '#fed7aa');
+      skyGrad.addColorStop(1, '#ffedd5');
+    }
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(vx, vy, vw, vh * 0.55);
+
+    // Desert Sun
+    ctx.fillStyle = isDark ? '#fde047' : '#f59e0b';
+    ctx.beginPath();
+    ctx.arc(vx + vw - 60, vy + 55, 20, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Alluvial River Basin (Indus / Hakra-Sarasvati River Plain)
+    const groundGrad = ctx.createLinearGradient(vx, vy + 160, vx, vy + vh);
+    if (isDark) {
+      groundGrad.addColorStop(0, '#451a03');
+      groundGrad.addColorStop(0.4, '#291409');
+      groundGrad.addColorStop(1, '#0f172a');
+    } else {
+      groundGrad.addColorStop(0, '#d97706');
+      groundGrad.addColorStop(0.4, '#b45309');
+      groundGrad.addColorStop(1, '#78350f');
+    }
+    ctx.fillStyle = groundGrad;
+    ctx.fillRect(vx, vy + 160, vw, vh - 160);
+
+    // Flowing River Arteries with Water Shimmer
+    const rGrad = ctx.createLinearGradient(vx + 180, vy + 160, vx + 380, vy + vh);
+    rGrad.addColorStop(0, '#0284c7');
+    rGrad.addColorStop(1, '#0369a1');
+    ctx.fillStyle = rGrad;
+
+    ctx.beginPath();
+    ctx.moveTo(vx + 310, vy + 160);
+    ctx.bezierCurveTo(vx + 270, vy + 220, vx + 160, vy + 280, vx + 50, vy + vh);
+    ctx.lineTo(vx + 140, vy + vh);
+    ctx.bezierCurveTo(vx + 250, vy + 280, vx + 340, vy + 220, vx + 365, vy + 160);
+    ctx.closePath();
+    ctx.fill();
+
+    // 3-STAGE COMPARISON CARDS OVERLAY
+    const cards = [
+      {
+        title: '1. Pre-Harappan (7000-5500 BCE)',
+        sub: 'Bhirrana & Kunal (Haryana)',
+        badge: 'Hakra Ware & Silver Tiaras',
+        col: '#ea580c',
+        x: vx + 12, y: vy + 38, w: vw - 24, h: 56
+      },
+      {
+        title: '2. Early Harappan (3300-2600 BCE)',
+        sub: 'Kot Diji & Rehman Dheri',
+        badge: 'Fortified Mud-Brick Perimeters',
+        col: '#f59e0b',
+        x: vx + 12, y: vy + 100, w: vw - 24, h: 56
+      },
+      {
+        title: '3. Mature Harappan (2600-1900 BCE)',
+        sub: 'Harappa, Mohenjo-daro & Dholavira',
+        badge: 'Orthogonal Grid Metropolis',
+        col: '#0284c7',
+        x: vx + 12, y: vy + 275, w: vw - 24, h: 62
+      }
+    ];
+
+    cards.forEach(crd => {
+      const cardBg = isDark ? 'rgba(15, 23, 42, 0.95)' : '#ffffff';
+      SimDraw.drawPanel(ctx, crd.x, crd.y, crd.w, crd.h, { bg: cardBg, radius: 8, stroke: crd.col, lineWidth: 1.5 });
+      ctx.fillStyle = crd.col;
+      ctx.fillRect(crd.x, crd.y, 5, crd.h);
+
+      ctx.font = '700 11px Inter, system-ui';
+      ctx.fillStyle = crd.col;
+      ctx.fillText(crd.title, crd.x + 14, crd.y + 18);
+
+      ctx.font = '600 9.5px Inter, system-ui';
+      ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+      ctx.fillText(crd.sub, crd.x + 14, crd.y + 34);
+
+      ctx.font = '600 9px Inter, system-ui';
+      ctx.fillStyle = crd.col;
+      ctx.textAlign = 'right';
+      ctx.fillText(crd.badge, crd.x + crd.w - 12, crd.y + 34);
+      ctx.textAlign = 'left';
+    });
+
+    // Bottom Summary Banner
+    const bannerBg = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(241, 245, 249, 0.98)';
+    SimDraw.drawPanel(ctx, vx + 16, vy + vh - 42, vw - 32, 32, { bg: bannerBg, radius: 8, stroke: isDark ? '#f59e0b' : '#d97706', lineWidth: 1.2 });
+    ctx.font = '600 11px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#f1f5f9' : '#0f172a';
+    ctx.textAlign = 'center';
+    ctx.fillText('🏛️ Organic Village Roots -> Standardized Grid Metropolis', vx + vw / 2, vy + vh - 22);
+
+    ctx.restore();
+  }
+
+  // -------------------------------------------------------------
+  // 2. PRE-HARAPPAN ROOTS: BHIRRANA & KUNAL (7000-5500 BCE)
+  // -------------------------------------------------------------
+  _drawPreHarappanRoots(ctx, vx, vy, vw, vh, t, isDark) {
+    const c = this.colors;
+    ctx.save();
+
+    const bgGrad = ctx.createLinearGradient(vx, vy, vx + vw, vy + vh);
+    if (isDark) {
+      bgGrad.addColorStop(0, '#0c1a30');
+      bgGrad.addColorStop(1, '#030712');
+    } else {
+      bgGrad.addColorStop(0, '#f8fafc');
+      bgGrad.addColorStop(1, '#f1f5f9');
+    }
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(vx, vy, vw, vh);
+
+    const midX = vx + vw / 2;
+    const inspT = this._actionAnimTime;
+
+    // LEFT PANEL: BHIRRANA HAKRA WARE POTTERY & DANCING GIRL GRAFFITI
+    const leftX = vx + 14, leftY = vy + 36, boxW = vw / 2 - 20, boxH = vh - 88;
+    const cardBg = isDark ? 'rgba(15, 23, 42, 0.95)' : '#ffffff';
+    SimDraw.drawPanel(ctx, leftX, leftY, boxW, boxH, { bg: cardBg, radius: 10, stroke: '#ea580c', lineWidth: 1.5 });
+
+    ctx.font = '700 11.5px Inter, system-ui';
+    ctx.fillStyle = '#ea580c';
+    ctx.fillText('BHIRRANA (Haryana)', leftX + 12, leftY + 20);
+
+    const potX = leftX + boxW / 2, potY = leftY + 95;
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    ctx.beginPath();
+    ctx.ellipse(potX, potY + 40, 32, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const jarGrad = ctx.createLinearGradient(potX - 32, potY - 35, potX + 32, potY + 35);
+    jarGrad.addColorStop(0, '#ea580c');
+    jarGrad.addColorStop(0.5, '#c2410c');
+    jarGrad.addColorStop(1, '#7c2d12');
+    ctx.fillStyle = jarGrad;
+    ctx.strokeStyle = '#451a03';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(potX, potY, 34, 40, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#9a3412';
+    ctx.fillRect(potX - 16, potY - 44, 32, 8);
+    ctx.strokeRect(potX - 16, potY - 44, 32, 8);
+
+    // Dancing Girl Graffiti on Pottery
+    ctx.strokeStyle = inspT > 0 ? '#fde047' : (isDark ? '#ffffff' : '#000000');
+    ctx.lineWidth = inspT > 0 ? 2.8 : 2;
+    ctx.beginPath();
+    ctx.moveTo(potX - 6, potY + 8); ctx.lineTo(potX - 6, potY - 12);
+    ctx.arc(potX - 6, potY - 16, 3.5, 0, Math.PI * 2);
+    ctx.moveTo(potX - 6, potY - 6); ctx.lineTo(potX + 5, potY - 2);
+    ctx.moveTo(potX - 6, potY + 8); ctx.lineTo(potX - 14, potY + 24);
+    ctx.moveTo(potX - 6, potY + 8); ctx.lineTo(potX, potY + 24);
+    ctx.stroke();
+
+    // High-Contrast Bullet Points
+    ctx.font = '400 8.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#1e293b';
+    this._wrapText(ctx, '- Hakra Ware Red-Slip Pottery\n- Famous "Dancing Girl" graffiti on potsherd (pre-dating Mohenjo-daro)\n- 7000-5500 BCE radiocarbon dates', leftX + 12, leftY + 155, boxW - 24, 13);
+
+    // RIGHT PANEL: KUNAL SILVER ORNAMENTS
+    const rightX = midX + 6;
+    SimDraw.drawPanel(ctx, rightX, leftY, boxW, boxH, { bg: cardBg, radius: 10, stroke: isDark ? '#38bdf8' : '#0284c7', lineWidth: 1.5 });
+
+    ctx.font = '700 11.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#38bdf8' : '#0284c7';
+    ctx.fillText('KUNAL (Haryana)', rightX + 12, leftY + 20);
+
+    const crownX = rightX + boxW / 2, crownY = leftY + 95;
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    ctx.beginPath();
+    ctx.ellipse(crownX, crownY + 40, 36, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const silverGrad = ctx.createLinearGradient(crownX - 40, crownY, crownX + 40, crownY);
+    silverGrad.addColorStop(0, '#cbd5e1');
+    silverGrad.addColorStop(0.5, '#f8fafc');
+    silverGrad.addColorStop(1, '#94a3b8');
+    ctx.fillStyle = silverGrad;
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.8;
+
+    ctx.beginPath();
+    ctx.moveTo(crownX - 38, crownY + 10);
+    ctx.quadraticCurveTo(crownX, crownY - 32, crownX + 38, crownY + 10);
+    ctx.lineTo(crownX + 30, crownY + 18);
+    ctx.quadraticCurveTo(crownX, crownY - 16, crownX - 30, crownY + 18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    for (let b = 0; b < 7; b++) {
+      ctx.fillStyle = (b % 2 === 0) ? '#ea580c' : '#0284c7';
+      ctx.beginPath();
+      ctx.arc(crownX - 24 + b * 8, crownY + 28, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.font = '400 8.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#1e293b';
+    this._wrapText(ctx, '- 2 Royal Silver Tiaras / Crowns\n- Steatite & carnelian micro-beads\n- Copper arrowheads & metallurgical furnace\n- Mud-brick pit dwellings', rightX + 12, leftY + 155, boxW - 24, 13);
+
+    // Bottom Summary Banner
+    const bannerBg = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(241, 245, 249, 0.98)';
+    SimDraw.drawPanel(ctx, vx + 16, vy + vh - 42, vw - 32, 32, { bg: bannerBg, radius: 8, stroke: isDark ? '#f59e0b' : '#d97706', lineWidth: 1.2 });
+    ctx.font = '600 10.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#f1f5f9' : '#0f172a';
+    ctx.textAlign = 'center';
+    ctx.fillText('🏺 Pre-Harappan Roots: Indigenous craftsmanship developed millennia before cities', vx + vw / 2, vy + vh - 22);
+
+    ctx.restore();
+  }
+
+  // -------------------------------------------------------------
+  // 3. MATURE HARAPPAN STANDARDIZATION & BRICK METROLOGY
+  // -------------------------------------------------------------
+  _drawMatureStandardization(ctx, vx, vy, vw, vh, t, isDark) {
+    const c = this.colors;
+    ctx.save();
+
+    const bgGrad = ctx.createLinearGradient(vx, vy, vx + vw, vy + vh);
+    if (isDark) {
+      bgGrad.addColorStop(0, '#0c1a30');
+      bgGrad.addColorStop(1, '#030712');
+    } else {
+      bgGrad.addColorStop(0, '#f8fafc');
+      bgGrad.addColorStop(1, '#f1f5f9');
+    }
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(vx, vy, vw, vh);
+
+    const midX = vx + vw / 2;
+
+    const lblBg = isDark ? 'rgba(15, 23, 42, 0.95)' : '#ffffff';
+    SimDraw.drawLabel(ctx, 'THE GOLDEN RATIO METRIC: 1 : 2 : 4', midX, vy + 42, {
+      bg: lblBg,
+      color: isDark ? '#f59e0b' : '#9a3412'
+    });
+
+    // 3D ISOMETRIC HARAPPAN BAKED BRICK
+    const bx = vx + 130, by = vy + 135;
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    ctx.beginPath();
+    ctx.ellipse(bx + 15, by + 45, 95, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ea580c';
+    ctx.strokeStyle = '#7c2d12';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(bx - 60, by - 15);
+    ctx.lineTo(bx + 40, by - 55);
+    ctx.lineTo(bx + 90, by - 25);
+    ctx.lineTo(bx - 10, by + 15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#c2410c';
+    ctx.beginPath();
+    ctx.moveTo(bx - 60, by - 15);
+    ctx.lineTo(bx - 10, by + 15);
+    ctx.lineTo(bx - 10, by + 45);
+    ctx.lineTo(bx - 60, by + 15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#9a3412';
+    ctx.beginPath();
+    ctx.moveTo(bx - 10, by + 15);
+    ctx.lineTo(bx + 90, by - 25);
+    ctx.lineTo(bx + 90, by + 5);
+    ctx.lineTo(bx - 10, by + 45);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    SimDraw.drawLabel(ctx, 'Length: 28 cm (4x)', bx + 15, by - 48, { bg: lblBg, color: isDark ? '#fde047' : '#9a3412' });
+    SimDraw.drawLabel(ctx, 'Width: 14 cm (2x)', bx + 85, by + 2, { bg: lblBg, color: isDark ? '#fde047' : '#9a3412' });
+    SimDraw.drawLabel(ctx, 'Height: 7 cm (1x)', bx - 65, by + 35, { bg: lblBg, color: isDark ? '#fde047' : '#9a3412' });
+
+    // INTERLOCKING ENGLISH BOND WALL SIMULATOR
+    const wallY = vy + 215, wallW = vw - 32;
+    const cardBg = isDark ? 'rgba(15, 23, 42, 0.95)' : '#ffffff';
+    SimDraw.drawPanel(ctx, vx + 16, wallY, wallW, 115, { bg: cardBg, radius: 8, stroke: '#10b981', lineWidth: 1.5 });
+
+    ctx.font = '700 11px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#10b981' : '#047857';
+    ctx.fillText('INTERLOCKING HARAPPAN BRICK BONDING:', vx + 24, wallY + 18);
+
+    const courses = this._brickBondCount || 3;
+    for (let c = 0; c < courses; c++) {
+      const cy = wallY + 32 + c * 18;
+      const isHeader = (c % 2 === 1);
+      const brickLen = isHeader ? 24 : 48;
+
+      ctx.fillStyle = isHeader ? '#ea580c' : '#c2410c';
+      ctx.strokeStyle = '#451a03';
+      ctx.lineWidth = 1.5;
+
+      const offset = (c % 2 === 0) ? 0 : 12;
+      for (let bx = vx + 28 + offset; bx < vx + wallW - 10; bx += brickLen + 4) {
+        ctx.fillRect(bx, cy, brickLen, 15);
+        ctx.strokeRect(bx, cy, brickLen, 15);
+      }
+    }
+
+    ctx.font = '400 9px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#1e293b';
+    ctx.fillText('Alternating stretchers (28cm) & headers (14cm) prevented vertical cracks across millennia.', vx + 24, wallY + 104);
+
+    // Bottom Summary Banner
+    const bannerBg = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(241, 245, 249, 0.98)';
+    SimDraw.drawPanel(ctx, vx + 16, vy + vh - 42, vw - 32, 32, { bg: bannerBg, radius: 8, stroke: isDark ? '#f59e0b' : '#d97706', lineWidth: 1.2 });
+    ctx.font = '600 10.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#f1f5f9' : '#0f172a';
+    ctx.textAlign = 'center';
+    ctx.fillText('🧱 1:2:4 Brick Ratio standardized across thousands of kilometers', vx + vw / 2, vy + vh - 22);
+
+    ctx.restore();
+  }
+
+  // -------------------------------------------------------------
+  // 4. 3D ISOMETRIC METROPOLIS DIORAMA: CITADEL & LOWER TOWN
+  // -------------------------------------------------------------
+  // -------------------------------------------------------------
+  // 4. 3D ISOMETRIC METROPOLIS DIORAMA: CITADEL & LOWER TOWN
+  // -------------------------------------------------------------
+  _drawDualMetropolisPlan(ctx, vx, vy, vw, vh, t, isDark) {
+    const c = this.colors;
+    ctx.save();
+
+    // Studio Background
+    const bgGrad = ctx.createLinearGradient(vx, vy, vx + vw, vy + vh);
+    if (isDark) {
+      bgGrad.addColorStop(0, '#0c1a30');
+      bgGrad.addColorStop(1, '#030712');
+    } else {
+      bgGrad.addColorStop(0, '#f1f5f9');
+      bgGrad.addColorStop(1, '#e2e8f0');
+    }
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(vx, vy, vw, vh);
+
+    const isFlowing = this._actionAnimTime > 0;
+    const flowPulse = Math.sin(t * 8) * 0.5 + 0.5;
+
+    // =============================================================
+    // LEFT HALF: 3D ELEVATED WESTERN CITADEL & THE GREAT BATH
+    // =============================================================
+    const citX = vx + 12, citY = vy + 34, citW = 205, citH = 300;
+    const cardBg = isDark ? 'rgba(15, 23, 42, 0.95)' : '#ffffff';
+    SimDraw.drawPanel(ctx, citX, citY, citW, citH, { bg: cardBg, radius: 10, stroke: '#f59e0b', lineWidth: 1.8 });
+
+    // Citadel Header Badge
+    ctx.font = '700 11px Inter, system-ui';
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillText('WESTERN CITADEL (MOHENJO-DARO)', citX + 10, citY + 18);
+    ctx.font = '600 8.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#fde047' : '#9a3412';
+    ctx.fillText('▲ 12m Elevated Mud-Brick Platform', citX + 10, citY + 30);
+
+    // 1. ELEVATED MUD-BRICK PODIUM (Isometric Layered Base)
+    const podX = citX + 12, podY = citY + 40, podW = citW - 24, podH = 115;
+    ctx.fillStyle = isDark ? '#78350f' : '#b45309';
+    ctx.fillRect(podX, podY, podW, podH);
+    ctx.strokeStyle = '#451a03';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(podX, podY, podW, podH);
+
+    // Perimeter Fortification Wall & Bastions
+    ctx.fillStyle = '#9a3412';
+    ctx.fillRect(podX - 2, podY - 2, podW + 4, 6);
+    ctx.fillRect(podX - 2, podY + podH - 4, podW + 4, 6);
+    ctx.fillRect(podX - 2, podY - 2, 6, podH + 4);
+    ctx.fillRect(podX + podW - 4, podY - 2, 6, podH + 4);
+
+    // 2. THE MONUMENTAL GREAT BATH (12m x 7m x 2.4m)
+    const bathX = podX + podW / 2, bathY = podY + 54;
+    const bathOuterW = 120, bathOuterH = 68;
+
+    // Surrounding Brick Veranda & Dressing Rooms Cloister
+    ctx.fillStyle = isDark ? '#451a03' : '#d97706';
+    ctx.fillRect(bathX - bathOuterW / 2, bathY - bathOuterH / 2, bathOuterW, bathOuterH);
+    ctx.strokeStyle = '#7c2d12';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(bathX - bathOuterW / 2, bathY - bathOuterH / 2, bathOuterW, bathOuterH);
+
+    // Dressing Cloister Cells (8 side cubicles)
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+    for (let i = -2; i <= 2; i++) {
+      ctx.strokeRect(bathX - bathOuterW / 2 + 4, bathY + i * 11 - 5, 12, 10);
+      ctx.strokeRect(bathX + bathOuterW / 2 - 16, bathY + i * 11 - 5, 12, 10);
+    }
+
+    // Sunken Basin (Double-coursed baked brick sealed with gypsum/bitumen)
+    const basinW = 76, basinH = 44;
+    ctx.fillStyle = '#1c1917'; // Bitumen waterproof lining
+    ctx.fillRect(bathX - basinW / 2 - 2, bathY - basinH / 2 - 2, basinW + 4, basinH + 4);
+
+    // Pool Water with animated shimmer
+    const waterGrad = ctx.createLinearGradient(bathX - basinW / 2, bathY - basinH / 2, bathX + basinW / 2, bathY + basinH / 2);
+    waterGrad.addColorStop(0, '#0284c7');
+    waterGrad.addColorStop(0.5, '#0ea5e9');
+    waterGrad.addColorStop(1, '#0369a1');
+    ctx.fillStyle = waterGrad;
+    ctx.fillRect(bathX - basinW / 2, bathY - basinH / 2, basinW, basinH);
+
+    // North & South Monumental Descending Staircases
+    // North Stairs
+    ctx.fillStyle = '#fde047';
+    for (let s = 0; s < 5; s++) {
+      ctx.fillRect(bathX - 10, bathY - basinH / 2 + s * 3, 20, 2);
+    }
+    // South Stairs
+    for (let s = 0; s < 5; s++) {
+      ctx.fillRect(bathX - 10, bathY + basinH / 2 - 6 - s * 3, 20, 2);
+    }
+
+    // Water Ripple Animation
+    ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + Math.sin(t * 4) * 0.2})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(bathX, bathY, 20 + Math.sin(t * 3) * 4, 8 + Math.cos(t * 3) * 2, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Pool Label Overlay
+    ctx.font = '700 8.5px Inter, system-ui';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.fillText('THE GREAT BATH', bathX, bathY + 2);
+    ctx.font = '600 7px Inter, system-ui';
+    ctx.fillStyle = '#fef08a';
+    ctx.fillText('Bitumen Tar Waterproofing', bathX, bathY + 11);
+    ctx.textAlign = 'left';
+
+    // Corbelled Brick Outlet Drain
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 2]);
+    ctx.beginPath();
+    ctx.moveTo(bathX + basinW / 2, bathY + 6);
+    ctx.lineTo(podX + podW + 4, bathY + 6);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 3. GREAT GRANARY & PILLARED HALL FOUNDATIONS (Lower half of card)
+    const granY = citY + 162;
+    SimDraw.drawPanel(ctx, citX + 8, granY, citW - 16, 42, {
+      bg: isDark ? 'rgba(30, 27, 75, 0.6)' : '#f8fafc',
+      radius: 6,
+      stroke: isDark ? '#6366f1' : '#cbd5e1',
+      lineWidth: 1
+    });
+
+    ctx.font = '700 9px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#a5b4fc' : '#4338ca';
+    ctx.fillText('🏛️ GREAT GRANARY (27 Sleeper Blocks)', citX + 14, granY + 14);
+
+    // 6 miniature granary sleeper air blocks
+    for (let gb = 0; gb < 6; gb++) {
+      ctx.fillStyle = '#ea580c';
+      ctx.fillRect(citX + 16 + gb * 28, granY + 22, 22, 12);
+      ctx.strokeStyle = '#451a03';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(citX + 16 + gb * 28, granY + 22, 22, 12);
+    }
+
+    // Bullet Points
+    ctx.font = '400 8px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#1e293b';
+    this._wrapText(ctx, '- 12m elevated platform protects from Indus floods\n- Sunken pool sealed with natural bitumen asphalt\n- Granary air ducts prevent grain mildew\n- Pillared Assembly Hall with 20 stone column bases', citX + 10, citY + 218, citW - 20, 12);
+
+    // =============================================================
+    // RIGHT HALF: EASTERN LOWER TOWN (ORTHOGONAL GRID & COVERED SEWERS)
+    // =============================================================
+    const lowX = vx + vw - 222, lowY = vy + 34, lowW = 210, lowH = 300;
+    SimDraw.drawPanel(ctx, lowX, lowY, lowW, lowH, { bg: cardBg, radius: 10, stroke: isDark ? '#38bdf8' : '#0284c7', lineWidth: 1.8 });
+
+    // Lower Town Header Badge
+    ctx.font = '700 11px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#38bdf8' : '#0284c7';
+    ctx.fillText('EASTERN LOWER TOWN (RESIDENTIAL)', lowX + 10, lowY + 18);
+    ctx.font = '600 8.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#475569';
+    ctx.fillText('■ Orthogonal Grid & Covered Sewer Lines', lowX + 10, lowY + 30);
+
+    // 1. ORTHOGONAL RESIDENTIAL CITY GRID
+    const gridX = lowX + 10, gridY = lowY + 38, gridW = lowW - 20, gridH = 118;
+    ctx.fillStyle = isDark ? '#0f172a' : '#f8fafc';
+    ctx.fillRect(gridX, gridY, gridW, gridH);
+    ctx.strokeStyle = isDark ? '#334155' : '#cbd5e1';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(gridX, gridY, gridW, gridH);
+
+    // 4 Residential Courtyard Housing Blocks
+    const houseBlocks = [
+      { x: gridX + 4, y: gridY + 4, w: 78, h: 48, label: 'House Block A' },
+      { x: gridX + 106, y: gridY + 4, w: 78, h: 48, label: 'House Block B' },
+      { x: gridX + 4, y: gridY + 64, w: 78, h: 48, label: 'House Block C' },
+      { x: gridX + 106, y: gridY + 64, w: 78, h: 48, label: 'House Block D' }
+    ];
+
+    houseBlocks.forEach(hb => {
+      // Baked Brick Outer Walls
+      ctx.fillStyle = isDark ? '#78350f' : '#fed7aa';
+      ctx.fillRect(hb.x, hb.y, hb.w, hb.h);
+      ctx.strokeStyle = '#ea580c';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(hb.x, hb.y, hb.w, hb.h);
+
+      // Central Open Courtyard
+      ctx.fillStyle = isDark ? '#1e293b' : '#ffffff';
+      ctx.fillRect(hb.x + 22, hb.y + 12, 34, 24);
+      ctx.strokeRect(hb.x + 22, hb.y + 12, 34, 24);
+
+      // Private Bathroom & Well Room
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(hb.x + 4, hb.y + 4, 12, 10);
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(hb.x + 10, hb.y + 9, 2.5, 0, Math.PI * 2); ctx.fill();
+
+      // Sloped Waste Drain Chute from Bathroom to Street Drain
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(hb.x + 10, hb.y + hb.h);
+      ctx.lineTo(hb.x + 10, hb.y + hb.h + 6);
+      ctx.stroke();
+    });
+
+    // 2. MAIN 9-METRE BOULEVARD (North-South & East-West Cross Avenues)
+    // East-West Main Avenue
+    ctx.fillStyle = isDark ? '#1e1b4b' : '#e2e8f0';
+    ctx.fillRect(gridX, gridY + 52, gridW, 12);
+    // North-South Main Avenue
+    ctx.fillRect(gridX + 82, gridY, 24, gridH);
+
+    // 3. CONTINUOUS UNDERGROUND COVERED STREET DRAINS
+    // East-West Main Sewer Channel
+    ctx.strokeStyle = isFlowing ? (isDark ? '#38bdf8' : '#0284c7') : (isDark ? '#0369a1' : '#bae6fd');
+    ctx.lineWidth = isFlowing ? 5 : 3.5;
+    ctx.beginPath();
+    ctx.moveTo(gridX, gridY + 58);
+    ctx.lineTo(gridX + gridW, gridY + 58);
+    ctx.stroke();
+
+    // North-South Sewer Channel
+    ctx.beginPath();
+    ctx.moveTo(gridX + 94, gridY);
+    ctx.lineTo(gridX + 94, gridY + gridH);
+    ctx.stroke();
+
+    // DRAMATIC WATER FLOW SURGE ANIMATION WHEN CLICKED
+    const speed = isFlowing ? 120 : 25;
+    const particleCount = isFlowing ? 18 : 6;
+    
+    // Flowing water particles along East-West Drain
+    for (let p = 0; p < particleCount; p++) {
+      const flowProg = ((t * speed + p * 22) % gridW);
+      ctx.fillStyle = isFlowing ? (isDark ? '#fde047' : '#0284c7') : (isDark ? '#38bdf8' : '#0369a1');
+      ctx.beginPath();
+      ctx.arc(gridX + flowProg, gridY + 58, isFlowing ? 3.5 : 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Flowing water particles along North-South Drain
+    for (let p = 0; p < (isFlowing ? 12 : 4); p++) {
+      const flowProg = ((t * speed + p * 22) % gridH);
+      ctx.fillStyle = isFlowing ? '#38bdf8' : '#0ea5e9';
+      ctx.beginPath();
+      ctx.arc(gridX + 94, gridY + flowProg, isFlowing ? 3 : 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // HOUSE BATHROOM FLUSH PULSE (Water shooting from house chutes)
+    if (isFlowing) {
+      houseBlocks.forEach(hb => {
+        // Glowing Water Pulse from Private Bath
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(hb.x + 10, hb.y + 9, 5 + Math.sin(t * 12) * 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // High-velocity stream flowing down chute
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(hb.x + 10, hb.y + hb.h);
+        ctx.lineTo(hb.x + 10, hb.y + hb.h + 10);
+        ctx.stroke();
+      });
+
+      // FLOATING ACTIVE DRAINAGE HUD BADGE
+      SimDraw.drawPanel(ctx, gridX + 4, gridY + 6, gridW - 8, 22, {
+        bg: isDark ? 'rgba(2, 132, 199, 0.95)' : '#0284c7',
+        radius: 4,
+        stroke: '#ffffff',
+        lineWidth: 1.5
+      });
+      ctx.font = '700 8px Inter, system-ui';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚡ ACTIVE FLOW: Household Wastewater -> Street Mains -> Sumps', gridX + gridW / 2, gridY + 20);
+      ctx.textAlign = 'left';
+    }
+
+    // 4. LIMESTONE INSPECTION SUMPS / SOAK PITS (Square access traps)
+    const sumps = [
+      { x: gridX + 45, y: gridY + 58 },
+      { x: gridX + 94, y: gridY + 58 },
+      { x: gridX + 145, y: gridY + 58 }
+    ];
+    sumps.forEach(sp => {
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(sp.x - 5, sp.y - 5, 10, 10);
+      ctx.strokeStyle = '#451a03';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sp.x - 5, sp.y - 5, 10, 10);
+    });
+
+    // Sump Callout Badge
+    SimDraw.drawLabel(ctx, 'Limestone Inspection Sump', gridX + 94, gridY + 76, {
+      bg: isDark ? 'rgba(15, 23, 42, 0.95)' : '#ffffff',
+      color: isDark ? '#fde047' : '#9a3412'
+    });
+
+    // 5. PUBLIC CYLINDRICAL WELL
+    ctx.fillStyle = '#ea580c';
+    ctx.beginPath(); ctx.arc(gridX + 94, gridY + 22, 6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#0284c7';
+    ctx.beginPath(); ctx.arc(gridX + 94, gridY + 22, 3.5, 0, Math.PI * 2); ctx.fill();
+
+    // Bullet Points
+    ctx.font = '400 8px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#1e293b';
+    this._wrapText(ctx, '- Cardinal north-south & east-west grid street layout\n- Private bathrooms in every house with baked-brick paving\n- Underground drains with limestone slab inspection sumps\n- Clean public brick wells accessible to all neighborhoods', lowX + 10, lowY + 218, lowW - 20, 12);
+
+    // Bottom Summary Banner
+    const bannerBg = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(241, 245, 249, 0.98)';
+    SimDraw.drawPanel(ctx, vx + 16, vy + vh - 42, vw - 32, 32, { bg: bannerBg, radius: 8, stroke: isDark ? '#f59e0b' : '#d97706', lineWidth: 1.2 });
+    ctx.font = '600 10.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#f1f5f9' : '#0f172a';
+    ctx.textAlign = 'center';
+    ctx.fillText('🏛️ Dual City Division: Western Elevated Citadel & Eastern Orthogonal Lower Town', vx + vw / 2, vy + vh - 22);
+
+    ctx.restore();
+  }
+
+    _drawDynamicPedagogicalCard(ctx, px, py, pw, ph, stage, stageIdx, isDark) {
+    const cardBg = isDark ? this.colors.panelBg : '#ffffff';
+    const cardStroke = isDark ? '#334155' : '#cbd5e1';
+    SimDraw.drawPanel(ctx, px, py, pw, ph, { bg: cardBg, radius: 12, stroke: cardStroke, lineWidth: 1.5 });
+
+    ctx.save();
+    const data = stage.card;
+
+    // Stage Tag Pill
+    const tagBg = isDark ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7';
+    const tagBorder = isDark ? '#f59e0b' : '#d97706';
+    const tagColor = isDark ? '#f59e0b' : '#9a3412';
+    SimDraw.drawPanel(ctx, px + 16, py + 14, 95, 18, { bg: tagBg, radius: 4, stroke: tagBorder, lineWidth: 1 });
+    ctx.font = '700 8.5px Inter, system-ui';
+    ctx.fillStyle = tagColor;
+    ctx.textAlign = 'center';
+    ctx.fillText(data.tag, px + 16 + 47.5, py + 26);
+    ctx.textAlign = 'left';
+
+    // Card Title & Subtitle
+    ctx.font = '700 13px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#f1f5f9' : '#0f172a';
+    ctx.fillText(data.title, px + 16, py + 48);
+
+    ctx.font = '600 9.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
+    ctx.fillText(data.subtitle, px + 16, py + 62);
+
+    // Divider
+    ctx.strokeStyle = isDark ? '#334155' : '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px + 16, py + 70); ctx.lineTo(px + pw - 16, py + 70); ctx.stroke();
+
+    let curY = py + 86;
+
+    data.sections.forEach((sec) => {
+      ctx.font = '700 9.5px Inter, system-ui';
+      if (sec.colorKey === 'warning') {
+        ctx.fillStyle = isDark ? '#f59e0b' : '#9a3412';
+      } else if (sec.colorKey === 'accent') {
+        ctx.fillStyle = isDark ? '#38bdf8' : '#0369a1';
+      } else {
+        ctx.fillStyle = isDark ? '#10b981' : '#047857';
+      }
+      ctx.fillText(sec.heading, px + 16, curY);
+      curY += 13;
+
+      ctx.font = '400 9.5px Inter, system-ui';
+      ctx.fillStyle = isDark ? '#cbd5e1' : '#1e293b';
+      curY = this._wrapText(ctx, sec.text, px + 16, curY, pw - 32, 13);
+      curY += 8;
+    });
+
+    // Standardized Bottom Takeaway / Did You Know Pill
+    const pillY = py + ph - 74;
+    const infoBg = isDark ? 'rgba(15, 23, 42, 0.85)' : '#f1f5f9';
+    const infoStroke = isDark ? '#334155' : '#cbd5e1';
+    SimDraw.drawPanel(ctx, px + 14, pillY, pw - 28, 64, { bg: infoBg, radius: 6, stroke: infoStroke, lineWidth: 1 });
+    
+    ctx.font = '700 8.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#fde047' : '#9a3412';
+    ctx.fillText('💡 KEY INSIGHT:', px + 22, pillY + 13);
+
+    ctx.font = '500 8.5px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#0f172a';
+    this._wrapText(ctx, data.didYouKnow, px + 22, pillY + 24, pw - 44, 11);
+
+    ctx.restore();
+  }
+
+
+    _wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    if (!text) return;
+    const lines = text.split('\n');
+    let cy = y;
+    for (const l of lines) {
+      const words = l.split(' ');
+      let curLine = '';
+      for (const w of words) {
+        const test = curLine ? curLine + ' ' + w : w;
+        if (ctx.measureText(test).width > maxWidth && curLine) {
+          ctx.fillText(curLine, x, cy);
+          curLine = w;
+          cy += lineHeight;
+        } else {
+          curLine = test;
+        }
+      }
+      if (curLine) ctx.fillText(curLine, x, cy);
+      cy += lineHeight;
+    }
+  }
+
+  _drawCaption(ctx, caption) {
+    if (!caption) return;
+    const isDark = (typeof this._isDark === 'function') ? this._isDark() : true;
+    ctx.save();
+    ctx.font = '600 13px Inter, system-ui';
+    ctx.fillStyle = isDark ? '#f1f5f9' : '#0f172a';
+    ctx.textAlign = 'center';
+
+    const words = caption.split(' ');
+    const maxWidth = 720;
+    const lines = [];
+    let curLine = '';
+
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      const test = curLine ? curLine + ' ' + w : w;
+      if (ctx.measureText(test).width > maxWidth && curLine) {
+        lines.push(curLine);
+        curLine = w;
+      } else {
+        curLine = test;
+      }
+    }
+    if (curLine) lines.push(curLine);
+
+    const startY = lines.length > 1 ? 28 : 42;
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], W / 2, startY + i * 18);
+    }
+
+    ctx.restore();
+  }
+}

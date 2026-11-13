@@ -1,0 +1,62 @@
+{
+  "id": "q-l01-s01",
+  "type": "mcq-single@2",
+  "difficulty": "medium",
+  "bloomLevel": "analyse",
+  "stem": {
+    "en": "A shopkeeper carries a tray of heavy jars from the storeroom to the counter, holding it level at waist height the whole way, without letting it drop or bob. Take the work done by her hands on the tray over the walk."
+  },
+  "options": [
+    {
+      "id": "a",
+      "text": {
+        "en": "It is zero: her hands push straight up, but the tray moves sideways, so there is no displacement along that force."
+      },
+      "isCorrect": true
+    },
+    {
+      "id": "b",
+      "text": {
+        "en": "It is zero, because she carries the tray at steady speed, and a steadily moving tray needs no force from her hands."
+      },
+      "isCorrect": false
+    },
+    {
+      "id": "c",
+      "text": {
+        "en": "It is not zero, because her arms support the entire weight of the tray for the whole length of the walk."
+      },
+      "isCorrect": false
+    },
+    {
+      "id": "d",
+      "text": {
+        "en": "It is not zero, because the tray is displaced by a distance about as long as the storeroom itself."
+      },
+      "isCorrect": false
+    }
+  ],
+  "correctOptionId": "a",
+  "explanation": {
+    "en": "Work done by a constant force is the force multiplied by the displacement in the direction of that force. The tray is displaced horizontally; her hands push vertically. Displacement along the force is zero, so the work her hands do on the tray is zero however long the walk."
+  },
+  "hints": [
+    {
+      "en": "The rule is not 'force times distance'. It is force times the distance measured along the direction the force points."
+    },
+    {
+      "en": "Mark the direction her hands push, then mark the direction the tray actually travels, and ask which way the tray moves along her push."
+    }
+  ],
+  "tags": [
+    "work",
+    "zero-work",
+    "perpendicular"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-10-13T01:25:47.657Z",
+    "reviewedBy": "review-bar"
+  }
+}

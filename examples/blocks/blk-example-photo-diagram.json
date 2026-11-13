@@ -1,0 +1,36 @@
+{
+  "id": "blk-example-photo-diagram",
+  "type": "content-block@1",
+  "markdownRef": "blocks/blk-example-photo-diagram.md",
+  "position": "right",
+  "photoDiagram": {
+    "nodes": [
+      { "id": "sun", "x": 300, "y": 0, "kind": "label", "label": "Sunlight", "icon": "sun" },
+      { "id": "plant", "x": 120, "y": 190, "kind": "photo",
+        "src": "media/L01/flowering-plant.jpg", "alt": "A red hibiscus flower",
+        "label": "Flowering plant", "tone": 3 },
+      { "id": "pollinator", "x": 480, "y": 190, "kind": "photo",
+        "src": "media/L01/pollinator.jpg", "alt": "A bee visiting a flower",
+        "label": "Pollinator", "tone": 2 },
+      { "id": "litter", "x": 40, "y": 400, "kind": "label", "label": "Leaf litter", "icon": "leaf", "revealAt": 1 },
+      { "id": "decomp", "x": 240, "y": 400, "kind": "photo",
+        "src": "media/L01/decomposers.jpg", "alt": "Mushrooms decomposing leaf litter on a forest floor",
+        "label": "Decomposers", "tone": 5, "size": 80, "revealAt": 1 },
+      { "id": "soil", "x": 440, "y": 400, "kind": "label", "label": "Soil", "icon": "soil", "revealAt": 1 }
+    ],
+    "edges": [
+      { "from": "sun", "to": "plant", "style": "arrow" },
+      { "from": "plant", "to": "pollinator", "label": "food ⇄ pollen", "style": "doubleArrow", "tone": 1 },
+      { "from": "litter", "to": "decomp", "style": "arrow" },
+      { "from": "decomp", "to": "soil", "label": "nutrients", "style": "arrow" }
+    ],
+    "a11yCaption": "Sunlight reaches a flowering plant, which exchanges food and pollen with a pollinator. Separately, leaf litter is broken down by decomposers, returning nutrients to the soil."
+  },
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [
+      "Worked example for docs/photo-diagrams.md - reuses the same three already-licensed photos (credited in media/L01/photo-credits.txt) this field was built to replace a hand-coded DomSimulation for (see GENERATION-LOG-style reasoning in docs/simulation-authoring.md's 'CONTROLS: []' section). Two-beat markdown demonstrates revealAt: the decomposer trio (litter/decomp/soil) only appears at beat 1, and the diagram's auto-fit crop is tighter at beat 0 (just the plant/pollinator pair) than at beat 1 - the actual legibility mechanism, not just pacing."
+    ],
+    "reviewedAt": null
+  }
+}

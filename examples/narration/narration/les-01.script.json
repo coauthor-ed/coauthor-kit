@@ -1,0 +1,51 @@
+{
+  "format": "coauthor-narration-script@1",
+  "voices": [
+    {
+      "id": "andrew",
+      "label": "Andrew",
+      "name": "en-US-AndrewMultilingualNeural",
+      "rate": "-2%",
+      "pitch": "-2Hz"
+    },
+    {
+      "id": "neerja",
+      "label": "Neerja",
+      "name": "en-IN-NeerjaExpressiveNeural",
+      "rate": "+0%",
+      "pitch": "+0Hz"
+    }
+  ],
+  "segments": [
+    {
+      "block": "blk-l01-s01",
+      "step": "prompt",
+      "say": "The file now has a suspect, but a suspect is not yet a claim that a study can check. [[show.options]] On the screen are four claims about smoking, the same example your textbook uses. Some of them sound scientific, but they still give a study nothing to measure. So, which of these claims could a study actually test?",
+      "await": "answer"
+    },
+    {
+      "block": "blk-l01-s02",
+      "step": "b1",
+      "say": "[[show.cases]] These eight women are the cases: people who have the disease. A design that starts from them and [[show.time]] looks back in time for a cause is called a case-control study. It needs a second group, studied at the same time: [[show.controls+pool]] the controls, people who do not have the disease. [[focus.cases+controls]] Then every finding about the cases has something to be set against."
+    },
+    {
+      "block": "blk-l01-s02",
+      "step": "b2",
+      "say": "[[focus.controls]] How many controls should you take? That is your decision. [[controls]] With one control for each woman, [[show.share]] the study holds sixteen people, and half of them are ill. [[chosen]] With four for each woman, it holds forty, and only one in five is ill. The disease has not changed at all; [[show.choice]] only your choice has. [[focus.controls+controls]] The Boston investigators chose four controls for each case, thirty-two in all: [[show.pool]] girls born in the same hospital at about the same time. [[focus.share]] So the number of people in a case-control study tells you how many were studied, never how common the disease is. [[show.stepper]] Now set the number of controls yourself, [[focus.all]] and watch the share who are ill.",
+      "await": "interact",
+      "hint": "Try 1, 2, 3 and 4 controls for each case."
+    },
+    {
+      "block": "blk-l01-s02",
+      "step": "b3",
+      "say": "[[focus.cases+controls]] Both groups are then asked [[show.ask]] the same question about the past, in the same way. [[show.cells]] Each person falls into one of four cells: [[focus.cell-a+row-e]] exposed cases, [[focus.cell-b+row-e]] exposed controls, [[focus.cell-c+row-u]] unexposed cases and [[focus.cell-d+row-u]] unexposed controls. [[show.letters]] These cells are called a, b, c and d. [[show.margins]] The margins, [[focus.col-ac+mar-ac+cases]] a plus c [[focus.col-bd+mar-bd+controls]] and b plus d, are simply the two groups you chose. [[focus.letters]] The letters are only short names for counts of people, [[focus.controls+cases]] so read the people first, [[focus.letters]] and the letters after."
+    },
+    {
+      "block": "blk-l01-s02",
+      "step": "b4",
+      "say": "[[focus.cases+controls]] Three things define this design. [[show.time]] Exposure and disease have both already happened. The inquiry runs back from effect to cause. [[focus.controls]] And a comparison group is required. Every case-control study then takes four steps: [[show.step1]] choose the cases, [[show.step2]] choose the controls, [[show.step3]] measure exposure in both groups in the same way, [[show.step4]] and compare. [[focus.step1+step2]] The first two steps decide whether the comparison will be fair, [[show.next]] so we take them one at a time, starting with the cases. [[focus.all]] Tap any step, and see which people it is about.",
+      "await": "interact",
+      "hint": "Tap each step, and see its people light up."
+    }
+  ]
+}

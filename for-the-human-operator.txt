@@ -1,0 +1,71 @@
+FOR THE HUMAN OPERATOR (agents: do not read this file)
+
+SET UP
+  node tools/operator/start.mjs --from <kit folder or git url> --into <workspace>
+  Asks for bundle id, chapter file, subject, grade or level (blank = none; non-interactive: --no-grade or --grade ""), look, audience, subject pack, own material, web search. Prints the first next.mjs line.
+  Choose look, audience and subject pack here (flags --look quill|plain, --audience school|college, --subject-pack <id>, --source-owned):
+    profile.json {look, audience} is written once for the whole repo; a later bundle with another look or audience gets "look"/"audience" in its bundle.json.
+    The look also sets the games: quill = mini-games and arcade practice; plain = no arcade, mini-game optional. Want a playful course? Pick quill for it.
+    --subject-pack names packs/subject/<id>/ (blank = none; doctor flags a missing folder). --source-owned: your own material, close paraphrase allowed.
+    Changing profile.json later: rerun node tools/staged-generation/build-bundles.mjs; doctor warns when bundles are stale or looks disagree.
+  Add another bundle later: run start.mjs again in the workspace.
+  node tools/operator/doctor.mjs [--selftest]      is everything healthy?
+  doctor.mjs --narration [--install] [--net]: narrated courses; checks edge-tts, ffmpeg, the engine tools; --install runs pip --user; --net lists the voices.
+  Manual kit copy instead: rsync -a --filter='merge kit-files.txt' <master>/ ./
+
+GENERATE
+  node tools/staged-generation/next.mjs --bundle <id>      prints one prompt; paste into your agent
+  next.mjs --interactive: for Stage 1b (outline), Stage 2 (a lesson), a Stage 3 scene build and B1 (bank plan) the agent
+    reads first, then asks you its questions (course plans, key slide visuals, a scene wireframe, the question mix) and
+    waits for your answer. Live sessions. Q and A kept in courses/<id>/steer/. One scene: --target L01/<Scene>.
+  next.mjs --interactive-async: the agent writes its questions into steer/<file> and stops; next.mjs prints
+    "waiting for your choice". Write your answer under a new "## Answer 1" heading, then run next.mjs again.
+    Works with orchestrate and auto-run. bundle.json "interactiveMode": "async" makes it the default.
+  Another way for a built scene: save a review note of kind "another way", accept it, then
+    next.mjs --interactive --target L01/<Scene>: the agent offers 2 new concepts and rebuilds.
+  node tools/staged-generation/orchestrate.mjs --bundle <id>    prints a block of prompts for a live session
+  Two machines on one bundle: --shard 1/2 and --shard 2/2 (or --lessons L01-L04).
+  Web search is off. To allow it: node tools/operator/web-mode.mjs on, and add --web.
+  Narrow what the agent sees: node tools/operator/focus.mjs <bundle>   (--clear to undo)
+
+PREVIEW AND REVIEW
+  node tools/operator/preview.mjs        starts the kit server (+ the engine if none found); prints deep links, pairing code, QR
+  node tools/operator/contact-sheet.mjs --bundle <id> --lesson L02     screenshots of every beat
+  Dashboard: <kit url>/dashboard.html. In the lesson preview the review panel approves and takes notes; drag it by its handle, dock it top or bottom, or collapse it (kept per browser).
+  node tools/operator/status.mjs [--bundle <id>] [--since 12h]
+
+APPROVE
+  node tools/operator/approve.mjs --bundle <id> --slide L01S03 | --lesson L01 | --module <id> | --bank <id> | --all  [--yes]
+  unapprove.mjs takes the same scopes. Dry run unless --yes. Approved stays approved when you edit; unapprove by hand.
+
+REVISE
+  Give the agent: Read REVISE.md and follow it. Bundle: X. Scope: L02S03. Do: <what to change>.
+  Notes you took become prompts: node tools/operator/notes.mjs --dispatch [--combined]
+  Or click Copy fix prompt (review panel: this lesson, More: all lessons; dashboard: per lesson or bundle) and paste it.
+  Only accepted notes go in. Yours start accepted; model notes need Accept in the dashboard.
+  After pasting: Mark these N done (beside Copy fix prompt) closes exactly the notes that prompt held.
+  Each note: state (open/accepted/rejected/done), Edit, Delete; done notes hide unless "show done".
+  CLI: notes.mjs --edit <id> [--text ..] [--kind ..] [--scope ..] | --delete <id> | --done n1,n2 | --reopen n1,n2
+  courses/<id>/review-notes.json is hand-editable: { "notes": [ { "id": "n4", "scope": "L02S03", "kind": "bug",
+    "state": "accepted", "text": "...", "source": "human", "beat": 2, "stage": "3" (directions only), "at": "<iso>" } ] }
+
+STEER (before or while generating)
+  Dashboard > Steer generation: a direction for the bundle, a lesson, a slide or a scene, even one that is only
+  in the outline or a stub; optional stage. Or: node tools/operator/notes.mjs --direct L02/RampScene "<text>" [--stage 3]
+  next.mjs then adds "Notes: n4,n7" to that unit's prompt; the agent reads them and marks them done when honored.
+  See them: notes.mjs --show-directions [--scope L02]
+
+MANUAL SCENE REVIEW (cheaper Stage 3)
+  node tools/staged-generation/next.mjs --bundle <id> --review manual   (or the dashboard's Next prompts with Review: manual)
+  The agent builds and checks the scene, writes its tests file, never runs it: Status review-pending.
+  Dashboard / review panel: Run tests (pass/fail inline; Add failures as notes), then Mark reviewed (Status done).
+
+PUBLISH
+  node tools/operator/publish.mjs --to ../public-repo [--bundle X] [--yes]   (dry run by default; --diff, --verify)
+  Then commit and push the public repo yourself. The working repo is the source of truth.
+
+HOUSEKEEPING
+  node tools/operator/kit-sync.mjs [--apply]     update kit files from the master, then rebuild briefs/bundles/ (--status, --reverse)
+  node tools/operator/clean.mjs --older-than 14d [--yes]
+  node tools/operator/meta.mjs apply --bundle <id> [--yes]   fill subject/grade into modules and banks
+  node tools/operator/manifest.mjs --bundle <id> [--write]    print/write manifest.json (v1 metadata) and TODO lines

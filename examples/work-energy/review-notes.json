@@ -1,0 +1,124 @@
+{
+  "notes": [
+    {
+      "id": "n1",
+      "scope": "L01S01",
+      "beat": 1,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "The \"reveal\" (or intro) animation effect is being shown on all the three beats - it should be shown only on the first beat. Also the controls should be shown only on the third beat",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-13T13:19:09.350Z"
+    },
+    {
+      "id": "n2",
+      "scope": "L01S07",
+      "beat": 0,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "the onchange event handling of the dropdown/select is buggy - can't lift the first sack (1 sack 1 m) unless the others are tried first",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T06:59:48.291Z"
+    },
+    {
+      "id": "n3",
+      "scope": "L01S07",
+      "beat": 2,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "The \"reveal\"/\"intro\" animation need not be shown on all the beats - showing in the first beat is enough",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T07:01:01.129Z"
+    },
+    {
+      "id": "n4",
+      "scope": "L01S09",
+      "beat": 2,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "The contents of the simulation should be different in the 2nd and 3rd beats - specifically in the 3rd beat it should depict the situation described in the beat text i.e. wheelchair etc (visuals from PushStopWorkScene simulation can be reused here in this beat)",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T07:04:36.816Z"
+    },
+    {
+      "id": "n5",
+      "scope": "L01S11",
+      "beat": 0,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "Need a diagram for this slide",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T07:06:04.259Z"
+    },
+    {
+      "id": "n6",
+      "scope": "L01S16",
+      "beat": 0,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "The situation text (e.g. \"A goalkeeper's hands on the ball she stops\") is not fully visible",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T07:14:12.354Z"
+    },
+    {
+      "id": "n7",
+      "scope": "L01S17",
+      "beat": 0,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "Clearly mention that these instructions are for a game which is shown in next slide, otherwise it might be a bit confusing (e.g. the text mentions \"A target work value is shown at the top of the panel\" but there isn't any panel shown)",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T07:15:32.053Z"
+    },
+    {
+      "id": "n8",
+      "scope": "L01S18",
+      "beat": 0,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "The \"Lift\" animation doesn't show because the destination position is already set when the slider associated with the lift height is configured/adjusted",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T07:17:21.529Z"
+    },
+    {
+      "id": "n9",
+      "scope": "L01S19",
+      "beat": 0,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "Clicking on \"Touch the panel\" button doesn't do anything - what is the intended behaviour?",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T07:18:53.356Z"
+    },
+    {
+      "id": "n10",
+      "scope": "L01S16",
+      "beat": 0,
+      "theme": "light",
+      "viewport": "1518x915",
+      "text": "Answering No to  \"Did it move\" on \"Pushing a wall that stays put\" question is marked incorrect",
+      "kind": "bug",
+      "source": "human",
+      "state": "done",
+      "at": "2026-10-14T07:47:54.988Z"
+    }
+  ]
+}

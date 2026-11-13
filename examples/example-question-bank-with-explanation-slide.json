@@ -1,0 +1,29 @@
+{
+  "id": "q-bank-atwood-01",
+  "type": "numeric-value@1",
+  "difficulty": "hard",
+  "bloomLevel": "apply",
+  "stem": {
+    "en": "Two blocks of mass 4 kg and 6 kg hang from a light, inextensible string passed over a frictionless pulley. Taking g = 10 m/s^2, find the magnitude of the acceleration of the system, in m/s^2."
+  },
+  "expectedValue": 2,
+  "tolerance": 0.1,
+  "unit": "m/s^2",
+  "explanation": {
+    "en": "Apply Newton's second law to each mass separately using the same tension and acceleration magnitude, then combine the two equations."
+  },
+  "explanationSlide": {
+    "presentation": "inline",
+    "blocks": [
+      { "blockRef": "explanations/bank/exp-example-hard-01.json" },
+      { "blockRef": "explanations/bank/exp-example-hard-02.json" }
+    ]
+  },
+  "hints": [],
+  "tags": [],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

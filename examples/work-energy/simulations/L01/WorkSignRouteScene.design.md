@@ -1,0 +1,42 @@
+# WorkSignRouteScene - design note
+
+Status: done
+Model: stealth/space-bunny-alpha[1m]
+Look review: opencode/space-bunny-free, Stage 3-look, 2026-09-29
+Writes helper: WorkEnergyDeck.js
+Archetype `ArcadeRouteScene`, skin `road`, deck `WORK_SIGN`, 8 rounds (one pass over the deck's eight items, so every situation is seen once).
+This scene is the chapter's first arcade scene, so it creates `WorkEnergyDeck.js` with `WORK_SIGN` as the file's **first export**. Seven later games append their own single export beside it and never edit or reorder this one.
+
+## Checks explained
+
+`check-scene L01/WorkSignRouteScene --bundle work-energy`: PASS - 0 fail(s), 6 warning(s) - all six the same `small` warning: the engine renders long item names at 12px on the road skin. The names are the stub's own wording, quoted verbatim from the deck spec ("Your hands on a school bag you lift", "A cart you push along a level floor", "The ball's push on a goalkeeper's hands"), and the 12px size is the engine's own item-name rendering, not something a deck can set. Shortening the names to dodge it would lose the specificity the deck is teaching, so they stand and the warning is explained. **The look review changed this reasoning:** the six warnings are not only small, they are *truncated* - every one of the eight names loses its last words inside the runner token and the menu sample - and the words lost are the discriminating ones ("you lift" / "you lower", "your upward push"). That is now Request 1 below, with a name-by-name table.
+
+`arcade-bot.mjs`: **PASS - all checks green** - run ends (414 steps), won with 3 hearts, the deliberate mistake shows up in the mix-ups, a boss round ran, progress 10/10, play-again resets.
+
+Deck contract honoured, since seven later scenes append to this file: `WORK_SIGN` is the first export, the eight items are the stub's eight in the stub's order with the stub's exact `why` lines, `myth: true` on exactly the two items the stub names (the wall, and the carried-across-the-floor upward push) and **not** on the held-still bag, which the stub says is taught straight. The `zero` group's `why` names the two different reasons - "nothing moved, or none of the force pointed along the way it moved" - rather than "no work is done". The key wording is the stub's own ("Did it move?" / "Is any of the force along the motion?" / "Same way as the motion?") and stays in the lesson's vocabulary: no "component", no "dot product", no "cos", and nothing in the deck names energy, power, efficiency, machines or momentum.
+
+## Progress           <- one line per step, added by scene-pass.mjs
+- rev n6: WORK_SIGN item names shortened so the token text is not truncated (WorkEnergyDeck.js)
+- rev n10: deck items with a zero leaf under two branches now carry route (kit ArcadeRouteScene honours item.route), so No on 'Did it move?' is accepted for the wall and held bag
+- deck review: WORK_SIGN goalie item names say whose push; other deck exports corrected (machine key gate, myth wording, units wording, friction/heat wording)
+
+## Look log
+
+`shots: build/shots/work-energy/L01/WorkSignRouteScene-sheet.png` (8 rows x dark/light, from `build/look-run-end.json`; step files and 5x zoom crops kept in `build/`).
+
+round 1 (contact sheet, then 8 named run shots per theme - gate descending, gate at the runner, trail filling, mix-up card, streak with the x2 chip, late run, end card - plus 4x/5x zoom crops of the score chip, the WHERE IT CAN END panel, the THE KEY SO FAR panel and the why card):
+- seen, good: the picture matches the slide's one line - three question cards in the key's own words, YES/NO doors that swap sides, the three end chips, a faced runner, a `tap to go on` why card that names the right answer and then the evidence, a verdict float plus score chip when an item is keyed, confetti and a PLAY AGAIN end card listing the learner's own mix-ups. Nothing off-canvas, no overlap in either theme except the one below, loop status right ("loop running" through a run, "ambient motion only ... fine" on the menu).
+- seen, defect 1: every item name is cut with an ellipsis inside the runner token and on the menu sample - 12px, two lines, e.g. "A bag you lower back down to ...", "A box carried across a flo...". Not a size nit: the tail of each name is the part that decides the answer. In the deck file, not in this scene (Request 1).
+- seen, defect 2: a `why` line long enough to wrap to three lines collides with the "tap to go on" hint - "so F x 0 along the force" and "tap to go on" print on top of each other, in both themes, on the mix-up card. `_drawWhy` uses a fixed 250px card and puts the hint at `y + ch - 32` whatever the text does. Kit file (Request 2).
+- seen, defect 3: in the light theme the "WHERE IT CAN END" chips and the "YES" chips in the key-so-far trail are near-white ink on a pastel fill - about 1.4:1 at 5x, where the sort skin's equivalent bins in `examples/media/arcade/GOOD-WorkSignBeltScene-light-play.png` use a dark ink on the same pastels. Kit file (Request 3).
+- seen, defect 4: each end-card mix-up row is fitted to one line, so `name: not said - answer` always ends in "...". Same root cause as 2 (fixed-width slots, long deck text). Kit file (Request 2).
+- seen, minor: the end card's PLAY AGAIN measures 2.9:1 in the light theme (white on mid-green, 15px bold) and the HUD's SCORE chip is reported at 1.2-1.3:1 - but read at 5x the SCORE chip is near-black on light blue (dark) and white on mid-blue (light), both legible, so the report's contrast line on that chip looks like a false positive. Left alone; kit-owned either way.
+- changed: nothing in `WorkSignRouteScene.js`. Every defect above is in `simulations/base/kit/` or in the deck file, both outside this stage's write-scope, and the two knobs this file does own (title, skin, rounds, lives, how) are right: `road` is the correct skin for a key run, 8 rounds is the stub's, and the how-to line names the door, not the answer. One round, no second round needed.
+- not verified by eye: the boss round's crown/x2 marker. Reaching the last four items honestly takes about 90 s of gates and the auto-steer probe used for screenshots kept producing mix-ups, so `arcade-bot.mjs`'s green result is the evidence for that round, not a screenshot.
+- open: the four defects above, all filed as Requests rather than fixed here.
+
+## Requests
+
+1. **`WorkEnergyDeck.js` (`WORK_SIGN`) - item names do not fit the runner token.** `drawToken` fits a name into a 190x58 token at 12-18px over at most 2 lines, which is about 30 characters; all eight names here are 35-45, so all eight truncate, and they truncate at the end where the deciding detail sits. Suggested replacements, all at or under the budget and all keeping the named force: 1 "Your hands lift a bag", 2 "Pushing a cart along a floor", 3 "The ball pushes her hands", 4 "Her hands stop the ball", 5 "You lower a bag back down", 6 "You push a wall that stays put" (the shipped example's wording), 7 "Your push on a carried box", 8 "You hold a heavy bag still" (the shipped example's wording). The `why` on item 7 is also the one that overflows the why card: "your push is straight up and the motion is sideways: at right angles, so F x 0 along the force" is 95 characters and wraps to three lines - the shipped example's "your push is up, the motion is sideways - at right angles" is 57 and does not.
+2. **`simulations/base/kit/ArcadeScene.js` `_drawWhy` - fixed card height.** `ch` is 250 whatever the content, the why block is fitted to up to 4 lines at 17->14px, and "tap to go on" is drawn at `y + ch - 32`. A two-line answer plus a three-line why puts the last why line at about y=337 and the hint at y=338. Either grow `ch` with the fitted line count or lift the hint above the progress bar. Every arcade deck with a `why` over about 78 characters hits this. Same file, `_drawEnd`: each mix-up row is fitted to a single line, so `name: not said - answer` is always cut - two lines there would fix it.
+3. **`simulations/base/kit/ArcadeRouteScene.js` `_drawEnds` and `_drawTrail` - chip ink in the light theme.** Both fill with `mix(tone, c.bgSurface, 0.35)` (or `c.s3`/`c.s6`) and let `pill()` choose the ink; on those pastels in the light theme the ink lands near-white, about 1.4:1. The sort skin's bins draw the same tone pastels with a dark ink and read cleanly (`examples/media/arcade/GOOD-WorkSignBeltScene-light-play.png`), so passing an explicit dark ink here would match the house look.

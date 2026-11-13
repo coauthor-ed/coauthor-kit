@@ -1,0 +1,39 @@
+{
+  "id": "q-editing-train-station",
+  "type": "error-correction@1",
+  "difficulty": "medium",
+  "stem": {
+    "en": "The following passage has not been edited. There is one error in each line. Identify the incorrect word and give the correction."
+  },
+  "lines": [
+    {
+      "id": "l1",
+      "text": { "en": "The train arrived late by over a hour." },
+      "incorrectWord": "a",
+      "correction": "an"
+    },
+    {
+      "id": "l2",
+      "text": { "en": "Passengers was seen pacing up and down." },
+      "incorrectWord": "was",
+      "correction": "were"
+    },
+    {
+      "id": "l3",
+      "text": { "en": "Announcements were made frequently to updated passengers." },
+      "incorrectWord": "updated",
+      "correction": "update"
+    },
+    {
+      "id": "l4",
+      "text": { "en": "Finally, the train arrived or people started their journey." },
+      "incorrectWord": "or",
+      "correction": "and"
+    }
+  ],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

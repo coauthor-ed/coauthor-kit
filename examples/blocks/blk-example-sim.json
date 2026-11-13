@@ -1,0 +1,15 @@
+{
+  "id": "blk-l04-s05",
+  "type": "content-block@1",
+  "markdownRef": "blocks/blk-example-sim.md",
+  "simulation": {
+    "src": "simulations/L04/TriangleHalfParallelogramScene.js",
+    "position": "right"
+  },
+  "mediaStep": 0,
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-08-16T00:00:00.000Z"
+  }
+}

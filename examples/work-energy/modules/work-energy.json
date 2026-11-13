@@ -1,0 +1,32 @@
+{
+  "id": "work-energy",
+  "moduleId": "work-energy",
+  "type": "module",
+  "authorId": "work-energy",
+  "title": {
+    "en": "Work, Energy, and Simple Machines"
+  },
+  "curriculumAlignment": "core",
+  "pedagogicalProfile": {
+    "themeTags": [
+      "work-and-energy",
+      "simple-machines"
+    ]
+  },
+  "lessons": [
+    {
+      "lessonRef": "lessons/les-01.json",
+      "title": {
+        "en": "Pushing the wall: what work actually means"
+      }
+    }
+  ],
+  "subject": "science",
+  "grade": 9,
+  "bookCode": "iesc1",
+  "chapterId": "iesc1-ch7",
+  "authoring": {
+    "status": "human-approved",
+    "reviewedAt": "2026-10-03T04:16:02.934Z"
+  }
+}

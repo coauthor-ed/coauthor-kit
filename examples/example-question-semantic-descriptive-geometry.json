@@ -1,0 +1,73 @@
+{
+  "id": "q-ext-angle-proof",
+  "type": "semantic-descriptive@1",
+  "difficulty": "medium",
+  "bloomLevel": "apply",
+  "answerMode": "math",
+  "prompt": {
+    "en": "In the given figure, sides CB and BA of triangle ABC have been produced to D and E respectively, such that angle ABD = 110 degrees and angle CAE = 135 degrees. Find angle ACB."
+  },
+  "diagram": {
+    "points": [
+      { "id": "A", "x": 150, "y": 20 },
+      { "id": "B", "x": 60, "y": 150 },
+      { "id": "C", "x": 260, "y": 150 },
+      { "id": "D", "x": -20, "y": 150, "label": "D" },
+      { "id": "E", "x": 210, "y": -60, "label": "E" }
+    ],
+    "segments": [
+      { "from": "D", "to": "C" },
+      { "from": "A", "to": "B", "extend": "end" },
+      { "from": "A", "to": "E", "extend": "end" },
+      { "from": "A", "to": "C" }
+    ],
+    "angles": [
+      { "at": "B", "from": "D", "to": "A", "label": "110°" },
+      { "at": "A", "from": "C", "to": "E", "label": "135°" }
+    ],
+    "a11yCaption": "Triangle ABC with side CB extended to D and side BA extended to E, angle ABD marked 110 degrees and angle CAE marked 135 degrees."
+  },
+  "rubric": [
+    {
+      "id": "linear-pair-b",
+      "label": { "en": "Uses the linear pair at B to find angle ABC" },
+      "level1": { "en": "Angle ABD and angle ABC lie on a straight line at B - what do they add up to?" },
+      "clue": { "en": "Angle ABD and angle ABC form a linear pair, so they add up to 180 degrees." },
+      "level2Template": { "en": "Since DBC is a straight line, angle ABC = 180 - 110 = ___ degrees." },
+      "accepted": [
+        "70",
+        "angle ABC = 70 degrees",
+        "angle ABC = 180 - 110 = 70"
+      ]
+    },
+    {
+      "id": "linear-pair-a",
+      "label": { "en": "Uses the linear pair at A to find angle BAC" },
+      "level1": { "en": "Angle CAE and angle BAC lie on a straight line at A - what do they add up to?" },
+      "clue": { "en": "Angle CAE and angle BAC form a linear pair, so they add up to 180 degrees." },
+      "level2Template": { "en": "Since EAB is a straight line, angle BAC = 180 - 135 = ___ degrees." },
+      "accepted": [
+        "45",
+        "angle BAC = 45 degrees",
+        "angle BAC = 180 - 135 = 45"
+      ]
+    },
+    {
+      "id": "angle-sum",
+      "label": { "en": "Applies the angle sum property of a triangle to find angle ACB" },
+      "level1": { "en": "The three angles of triangle ABC add up to 180 degrees - use the two you just found." },
+      "clue": { "en": "Angle ACB = 180 - angle ABC - angle BAC = 180 - 70 - 45." },
+      "level2Template": { "en": "By the angle sum property of a triangle, angle ACB = 180 - 70 - 45 = ___ degrees." },
+      "accepted": [
+        "65",
+        "angle ACB = 65 degrees",
+        "angle ACB = 180 - 70 - 45 = 65"
+      ]
+    }
+  ],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "id": "q-work-from-area",
+  "type": "numeric-value@1",
+  "difficulty": "medium",
+  "bloomLevel": "apply",
+  "stem": {
+    "en": "A block moves along a smooth horizontal floor from $x = 0$ to $x = 4\\ \\mathrm{m}$ while a single horizontal force acts on it. The force is not steady. It rises linearly from 0 N at $x = 0$ to 50 N at $x = 1\\ \\mathrm{m}$, holds at 50 N until $x = 3\\ \\mathrm{m}$, then falls linearly back to 0 N at $x = 4\\ \\mathrm{m}$. Find the work done by this force over the whole 4 m, in joules."
+  },
+  "graph": {
+    "functions": [
+      {
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            50
+          ],
+          [
+            3,
+            50
+          ],
+          [
+            4,
+            0
+          ]
+        ],
+        "label": "force",
+        "fill": true
+      }
+    ],
+    "xLabel": "Displacement (m)",
+    "yLabel": "Force (N)",
+    "xDomain": [
+      0,
+      4
+    ],
+    "yDomain": [
+      0,
+      60
+    ],
+    "xStep": 1,
+    "yStep": 10,
+    "a11yCaption": "Force against displacement: the force rises from 0 N to 50 N over the first metre, stays at 50 N until 3 m, then falls back to 0 N at 4 m. The region under the line is shaded."
+  },
+  "expectedValue": 150,
+  "tolerance": 2,
+  "unit": "J",
+  "explanation": {
+    "en": "Read the work off the force-displacement graph as the area under the curve: a triangle from 0 to 1 m, a rectangle from 1 m to 3 m, and a triangle from 3 m to 4 m. That is 1/2 x 1 x 50 = 25 J, plus 2 x 50 = 100 J, plus 1/2 x 1 x 50 = 25 J, giving 150 J."
+  },
+  "hints": [
+    {
+      "en": "Split the shaded region into pieces whose areas you already know: two triangles and one rectangle."
+    },
+    {
+      "en": "Each triangle has area one half of base times height: 1/2 x 1 m x 50 N. The flat middle part is a rectangle 2 m wide and 50 N tall."
+    }
+  ],
+  "tags": [
+    "work",
+    "force-displacement-graph",
+    "area-under-graph"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-10-14T00:00:00.000Z"
+  }
+}

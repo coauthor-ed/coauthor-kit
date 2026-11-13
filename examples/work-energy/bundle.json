@@ -1,0 +1,13 @@
+{
+  "bundleId": "work-energy",
+  "title": "Work, Energy, and Simple Machines",
+  "subject": "science",
+  "grade": 9,
+  "description": "First lesson of Work, Energy and Simple Machines: what work means in physics.",
+  "icon": "",
+  "tags": [
+    "physics",
+    "grade 9"
+  ],
+  "publicPath": "work-energy"
+}

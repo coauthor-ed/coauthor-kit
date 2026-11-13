@@ -1,0 +1,35 @@
+{
+  "id": "q-cloze-connected-world",
+  "type": "fill-blank@2",
+  "difficulty": "easy",
+  "template": {
+    "en": "The world today is {a} connected than ever before. Thanks to technology, people can {b} with friends and family across the globe instantly."
+  },
+  "blanks": [
+    {
+      "id": "a",
+      "expected": ["more"],
+      "options": [
+        { "value": "most", "label": { "en": "most" } },
+        { "value": "more", "label": { "en": "more" } },
+        { "value": "much", "label": { "en": "much" } },
+        { "value": "many", "label": { "en": "many" } }
+      ]
+    },
+    {
+      "id": "b",
+      "expected": ["communicate"],
+      "options": [
+        { "value": "communicates", "label": { "en": "communicates" } },
+        { "value": "communicated", "label": { "en": "communicated" } },
+        { "value": "communicating", "label": { "en": "communicating" } },
+        { "value": "communicate", "label": { "en": "communicate" } }
+      ]
+    }
+  ],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

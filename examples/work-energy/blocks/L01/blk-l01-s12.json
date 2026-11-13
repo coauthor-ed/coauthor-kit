@@ -1,0 +1,15 @@
+{
+  "id": "blk-l01-s12",
+  "type": "mini-game@1",
+  "src": "simulations/L01/BagWorkGameScene.js",
+  "objective": {
+    "en": "Hit the target work value exactly: set the mass, the lift height and the pull direction so the work reads the target number."
+  },
+  "xp": 15,
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-10-13T01:27:11.653Z",
+    "reviewedBy": "review-bar"
+  }
+}

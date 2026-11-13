@@ -1,0 +1,57 @@
+{
+  "renderer": "epi-curve@1",
+  "caption": "Onsets by day. One peak, two days after the shared lunch.",
+  "data": {
+    "unit": "day",
+    "xTitle": "Date of symptom onset",
+    "bins": [
+      {
+        "label": "11 Jun",
+        "count": 0
+      },
+      {
+        "label": "12 Jun",
+        "count": 2
+      },
+      {
+        "label": "13 Jun",
+        "count": 9
+      },
+      {
+        "label": "14 Jun",
+        "count": 16
+      },
+      {
+        "label": "15 Jun",
+        "count": 8
+      },
+      {
+        "label": "16 Jun",
+        "count": 3
+      },
+      {
+        "label": "17 Jun",
+        "count": 0
+      }
+    ],
+    "exposure": {
+      "at": "12 Jun",
+      "label": "Shared lunch",
+      "step": 2
+    },
+    "incubation": {
+      "to": "14 Jun",
+      "label": "About 2 days",
+      "step": 2
+    },
+    "notes": [
+      {
+        "at": "14 Jun",
+        "label": "Peak",
+        "text": "16 cases on one day",
+        "step": 1
+      }
+    ]
+  },
+  "position": "right"
+}

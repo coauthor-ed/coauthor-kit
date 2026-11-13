@@ -1,0 +1,57 @@
+{
+  "id": "q-fitness-fiesta-notice",
+  "type": "semantic-descriptive@2",
+  "difficulty": "medium",
+  "prompt": {
+    "en": "Your school is organizing a 'Fitness Fiesta Week' (yoga sessions, a healthy cooking competition, fitness quizzes) from October 12 to October 16. As the Health Club Secretary, draft a notice inviting participation. (Word limit: 50 words)"
+  },
+  "wordLimit": { "min": 40, "max": 60 },
+  "formatChecks": [
+    {
+      "id": "heading",
+      "pattern": "\\bNOTICE\\b",
+      "weight": 1,
+      "label": { "en": "Has a NOTICE heading" }
+    },
+    {
+      "id": "date-line",
+      "pattern": "\\b(19|20)\\d{2}\\b",
+      "weight": 1,
+      "label": { "en": "Has a date of issue" }
+    },
+    {
+      "id": "signoff",
+      "pattern": "\\b(secretary|convenor|monitor)\\b",
+      "flags": "i",
+      "weight": 1,
+      "label": { "en": "Signed off with a name and designation" }
+    }
+  ],
+  "rubric": [
+    {
+      "id": "activities",
+      "label": { "en": "Names at least one of the announced activities" },
+      "level1": { "en": "Mention what students will actually do that week." },
+      "clue": { "en": "Yoga sessions, a cooking competition, or fitness quizzes." },
+      "level2Template": { "en": "The week includes yoga sessions and a healthy ___ competition." },
+      "accepted": ["cooking", "healthy cooking"]
+    },
+    {
+      "id": "dates",
+      "label": { "en": "States the correct date range" },
+      "level1": { "en": "When does the week run?" },
+      "clue": { "en": "October 12 to October 16." },
+      "level2Template": { "en": "Fitness Fiesta Week runs from October 12 to October ___." },
+      "accepted": ["16", "sixteen"]
+    }
+  ],
+  "weights": { "format": 1, "content": 2, "wordLimit": 1 },
+  "explanation": {
+    "en": "NOTICE\n\nFitness Fiesta Week\n12 October 2025\n\nAll students are invited to participate in Fitness Fiesta Week, to be held from 12 to 16 October. The week includes daily yoga sessions, a healthy cooking competition, and fitness quizzes for all age groups. Interested students should register with the Health Club by 10 October.\n\nRiya Sharma\nHealth Club Secretary"
+  },
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

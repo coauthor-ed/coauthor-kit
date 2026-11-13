@@ -1,0 +1,22 @@
+{
+  "id": "les-01",
+  "lessonId": "les-01",
+  "type": "lesson",
+  "narrationRef": "narration/les-01.narration.json",
+  "title": {
+    "en": "Narration showcase: a predict with an opening picture, and a scene the voice drives"
+  },
+  "chapterId": "analytical-epidemiology/ch1",
+  "blocks": [
+    {
+      "blockRef": "blocks/L01/blk-l01-s01.json"
+    },
+    {
+      "blockRef": "blocks/L01/blk-l01-s02.json"
+    }
+  ],
+  "flow": {},
+  "authoring": {
+    "status": "ai-draft"
+  }
+}

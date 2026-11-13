@@ -1,0 +1,69 @@
+{
+  "id": "q-read-motion-graph",
+  "type": "mcq-single@2",
+  "difficulty": "medium",
+  "bloomLevel": "analyze",
+  "stem": {
+    "en": "The graph shows a runner's distance from the starting line over time. Which statement best describes their motion?"
+  },
+  "graph": {
+    "functions": [
+      {
+        "expression": "3*x",
+        "label": "distance"
+      }
+    ],
+    "xLabel": "Time (s)",
+    "yLabel": "Distance (m)",
+    "xDomain": [
+      0,
+      4
+    ],
+    "yDomain": [
+      0,
+      12
+    ]
+  },
+  "options": [
+    {
+      "id": "a",
+      "text": {
+        "en": "The runner moves at a constant speed the whole time."
+      },
+      "isCorrect": true
+    },
+    {
+      "id": "b",
+      "text": {
+        "en": "The runner speeds up throughout."
+      },
+      "isCorrect": false
+    },
+    {
+      "id": "c",
+      "text": {
+        "en": "The runner is standing still."
+      },
+      "isCorrect": false
+    }
+  ],
+  "correctOptionId": "a",
+  "explanation": {
+    "en": "A straight-line distance-time graph means equal distances are covered in equal time intervals - that's the definition of constant speed. A curving line (getting steeper) would mean speeding up; a flat horizontal line would mean standing still."
+  },
+  "hints": [
+    {
+      "en": "Look at whether the line is straight or curving, not just whether it's going up."
+    }
+  ],
+  "tags": [
+    "motion",
+    "graphing",
+    "distance-time-graph"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-08-19T00:00:00.000Z"
+  }
+}

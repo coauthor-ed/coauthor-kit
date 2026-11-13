@@ -1,0 +1,799 @@
+import { CanvasSimulation } from 'simulations/base/CanvasSimulation.js';
+import { readSimColors } from 'simulations/base/SimTheme.js';
+import { clamp01, cruise } from 'simulations/base/SimMotion.js';
+import {
+  drawDigitStrip, drawOverbar, drawTagPill, drawLabelText, mixHex, inkOn,
+} from './division-machinery.js';
+
+/**
+ * ShiftSubtractScene - companion to blk-l07-s07. Algebra for pure repeating
+ * decimals. The canvas is wide (the block declares `position: "below"`) and
+ * carries two example panels in the top half plus a magnifier panel
+ * bottom-left and a final summary band.
+ *
+ * Beat 0 builds example 1 (left): x = 0.7777... (top card), 10x = 7.7777...
+ * (middle card, the decimal point glides one place right), subtract arrow,
+ * then the result card 9x = 7 pops in. The overbar block `777...` sits
+ * inside the panel as a small reminder of what's repeating.
+ *
+ * Beat 1 magnifies the two tails (`7.7777...` and `0.7777...`) in a panel
+ * below example 1 - vertical guide lines between matching digit positions,
+ * `=` and `subtract` tag, the finite result `7` appears. The solved
+ * fraction card `x = 7/9` pops in at the bottom of example 1.
+ *
+ * Beat 2 builds example 2 (right): x = 0.272727... -> 100x = 27.2727...
+ * (decimal glides two places right) -> 99x = 27 -> x = 27/99 = 3/11 (with
+ * a `÷9` cancel stamp). A static `×10ⁿ` procedure tag at the top.
+ *
+ * Memory-less mount - this block only (cross-mount rule). Shares digit
+ * strip, overbar, tag pill, label text, mix/ink helpers via
+ * division-machinery.js, never state. Equation cards are drawn inline.
+ */
+
+const W = 1080;
+const H = 600;
+
+// Two example panels in the top half
+const PANEL_W = 480;
+const PANEL_H = 280;
+const PANEL_GAP = 60;
+const PANEL1_X = 30;
+const PANEL2_X = PANEL1_X + PANEL_W + PANEL_GAP;
+const PANEL_Y = 70;
+
+// Magnifier panel below example 1
+const MAG_X = PANEL1_X;
+const MAG_Y = PANEL_Y + PANEL_H + 16;
+const MAG_W = PANEL_W;
+const MAG_H = 130;
+
+// Per-panel equation card geometry
+const CARD_H = 48;
+const CARD_W = 280;
+const CARD_GAP = 16;
+const cardCy = (panel, slot) => {
+  return PANEL_Y + 66 + slot * (CARD_H + CARD_GAP);
+};
+const cardCx = (panel) => panel === 0
+  ? PANEL1_X + PANEL_W / 2
+  : PANEL2_X + PANEL_W / 2;
+
+// Cancel stamp (beat 2 final, below example 2)
+const CANCEL_X = (panel) => panel === 0 ? PANEL1_X + PANEL_W / 2 : PANEL2_X + PANEL_W / 2;
+const CANCEL_Y = PANEL_Y + PANEL_H + 18;
+
+const STEPS = [
+  { type: 'e1_build' },   // 0  example 1: top, middle, subtract, result cards
+  { type: 'magnify' },    // 1  magnifier panel + solved fraction
+  { type: 'e2_build' },   // 2  example 2: full chain + cancel stamp
+];
+const STEP_E1_BUILD = 0;
+const STEP_MAGNIFY = 1;
+const STEP_E2_BUILD = 2;
+const STEP_TERMINAL = 2;
+
+/** Maps blk-l07-s07's three markdown beats (3 entries). Clamps. */
+const BEAT_STEP_MAP = [
+  [{ idx: STEP_E1_BUILD, dwellMs: null }],
+  [{ idx: STEP_MAGNIFY, dwellMs: null }],
+  [{ idx: STEP_E2_BUILD, dwellMs: null }],
+];
+
+const COLOR_TOKEN_MAP = {
+  bgDeep:  ['--sim-bg-deep', '#0a0f1e'],
+  surface: ['--sim-bg-surface', '#111827'],
+  label:   ['--sim-label', '#e2e8f0'],
+  accent:  ['--sim-accent', '#818cf8'],
+  success: ['--sim-success', '#34d399'],
+  warning: ['--sim-warning', '#fbbf24'],
+};
+
+export class ShiftSubtractScene extends CanvasSimulation {
+  static WIDTH = W;
+  static HEIGHT = H;
+  static ARIA_LABEL =
+    'A wide canvas with two example panels in the top half. The first example: x equals zero ' +
+    'point seven repeating. Multiply by ten - the decimal glides one place right, ten x equals ' +
+    'seven point seven repeating. A subtract arrow points down to nine x equals seven, the tails ' +
+    'wiped. A magnifier panel below shows the two infinite tails side by side, the matching ' +
+    'positions aligned, and a single finite seven remaining. The solved fraction card reads x ' +
+    'equals seven over nine. The second example: x equals zero point two seven repeating; ' +
+    'multiplied by one hundred gives twenty-seven point two seven repeating; subtract gives ' +
+    'ninety-nine x equals twenty-seven. A divide-by-nine cancel stamp lands; the fraction ' +
+    'collapses to three over eleven. A static procedure tag at the top reads times ten to the n.';
+
+  static CONTROLS = [
+    { type: 'button', id: 'prev', label: '← Back' },
+    { type: 'button', id: 'next', label: 'Next ->' },
+    { type: 'button', id: 'replay', label: '↻ Replay' },
+  ];
+
+  constructor(container, config) {
+    super(container, config);
+    this.allowResume = true;
+    this.colors = null;
+
+    this.stepIndex = STEP_E1_BUILD;
+    this._stepEnter = 0;
+    this._clock = 0;
+
+    this._lessonLinked = false;
+    this._beatChain = null;
+    this._beatChainPos = 0;
+    this._beatChainDwell = null;
+
+    this._liveRegion = null;
+  }
+
+  async setup() {
+    await super.setup();
+    this._canvas.setAttribute('role', 'img');
+    this._canvas.setAttribute('aria-label', this.constructor.ARIA_LABEL);
+
+    this._reloadColors();
+    this._buildLiveRegion();
+    this._drawInitialFrame(this._ctx);
+  }
+
+  destroy() {
+    if (this._liveRegion) {
+      this._liveRegion.remove();
+      this._liveRegion = null;
+    }
+    super.destroy();
+  }
+
+  _reloadColors() {
+    this.colors = readSimColors(this.container, COLOR_TOKEN_MAP);
+  }
+
+  // ── Beat sync + navigation ────────────────────────────────────────────────
+
+  onBeatChange(beatIndex) {
+    this._lessonLinked = true;
+    const clamped = Math.max(0, Math.min(beatIndex, BEAT_STEP_MAP.length - 1));
+    const chain = BEAT_STEP_MAP[clamped];
+    this._beatChain = chain;
+    this._beatChainPos = 0;
+    this._beatChainDwell = chain[0].dwellMs != null ? chain[0].dwellMs / 1000 : null;
+    this._jumpToStep(chain[0].idx);
+  }
+
+  _tickBeatChain(dt) {
+    if (!this._lessonLinked || this._beatChainDwell == null) return;
+    this._beatChainDwell -= dt;
+    if (this._beatChainDwell > 0) return;
+    this._beatChainPos++;
+    const next = this._beatChain?.[this._beatChainPos];
+    if (!next) { this._beatChainDwell = null; return; }
+    this._jumpToStep(next.idx);
+    this._beatChainDwell = next.dwellMs != null ? next.dwellMs / 1000 : null;
+  }
+
+  _isBeatLocked() {
+    return this._lessonLinked && this.stepIndex < STEP_TERMINAL;
+  }
+
+  isControlHidden(id) {
+    const locked = this._isBeatLocked();
+    if (id === 'prev') return locked || this.stepIndex === 0;
+    if (id === 'next') return locked || this.stepIndex === STEP_TERMINAL;
+    if (id === 'replay') return locked || this.stepIndex !== STEP_TERMINAL;
+    return false;
+  }
+
+  onControlChange(id) {
+    if (id === 'prev') {
+      this._goStep(this.stepIndex - 1);
+    } else if (id === 'next') {
+      this._goStep(this.stepIndex + 1);
+    } else if (id === 'replay') {
+      this._lessonLinked = false;
+      this._beatChain = null;
+      this._jumpToStep(STEP_E1_BUILD);
+      this._announce('Replaying.');
+    }
+    this.requestUiUpdate?.();
+  }
+
+  _goStep(i) {
+    this._jumpToStep(Math.max(0, Math.min(STEPS.length - 1, i)));
+  }
+
+  _jumpToStep(i) {
+    this.stepIndex = i;
+    this._stepEnter = 0;
+    this._announce(STEPS[i].caption ?? '');
+    this.requestUiUpdate?.();
+  }
+
+  // ── A11y ──────────────────────────────────────────────────────────────────
+
+  _buildLiveRegion() {
+    this._liveRegion = document.createElement('div');
+    this._liveRegion.setAttribute('role', 'status');
+    this._liveRegion.setAttribute('aria-live', 'polite');
+    this._liveRegion.style.cssText =
+      'position:absolute;width:1px;height:1px;padding:0;margin:-1px;' +
+      'overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;';
+    this.container.appendChild(this._liveRegion);
+  }
+
+  _announce(text) {
+    if (this._liveRegion && text) this._liveRegion.textContent = text;
+  }
+
+  // ── Frame loop ────────────────────────────────────────────────────────────
+
+  _tick(ctx, dt) {
+    this._stepEnter += dt;
+    this._clock += dt;
+    this._tickBeatChain(dt);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = this.colors.bgDeep;
+    ctx.fillRect(0, 0, W, H);
+
+    this._drawProcedureTag(ctx);
+    this._drawPanel(ctx, 0);     // example 1 panel
+    this._drawExample1Content(ctx);
+
+    if (this.stepIndex >= STEP_E2_BUILD) {
+      this._drawPanel(ctx, 1);   // example 2 panel
+      this._drawExample2Content(ctx);
+    } else if (this.stepIndex >= STEP_MAGNIFY) {
+      this._drawMagnifierPanel(ctx);
+    }
+  }
+
+  _drawInitialFrame(ctx) {
+    this._tick(ctx, 0);
+  }
+
+  // ── Pieces ────────────────────────────────────────────────────────────────
+
+  _panelEdge() {
+    return mixHex(this.colors.label, this.colors.bgDeep, 0.78);
+  }
+
+  _tileBg() {
+    return mixHex(this.colors.bgDeep, this.colors.surface, 0.65);
+  }
+
+  _drawProcedureTag(ctx) {
+    const c = this.colors;
+    drawTagPill(ctx, {
+      text: '×10ⁿ (n = block length)', x: W / 2, y: 32,
+      bg: c.surface, ink: c.label, stroke: c.accent,
+    });
+  }
+
+  _drawPanel(ctx, panel) {
+    const c = this.colors;
+    const x = panel === 0 ? PANEL1_X : PANEL2_X;
+    const isE1 = panel === 0;
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x, PANEL_Y, PANEL_W, PANEL_H, 12);
+    ctx.fillStyle = c.surface;
+    ctx.fill();
+    ctx.strokeStyle = this._panelEdge();
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    drawLabelText(ctx, {
+      text: isE1 ? '1 digit block' : '2 digit block',
+      x: x + 20, y: PANEL_Y + 22,
+      color: c.label, font: '700 13px Inter, system-ui',
+    });
+
+    // overbar block reminder (inside the panel header row, far right)
+    const block = isE1 ? '777' : '27';
+    const cellW = 20;
+    const cellH = 22;
+    const gap = 4;
+    const totalBlockW = block.length * cellW + (block.length - 1) * gap;
+    const stripX0 = x + PANEL_W - 20 - totalBlockW;
+    const stripCy = PANEL_Y + 24;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (let k = 0; k < block.length; k++) {
+      const cx = stripX0 + k * (cellW + gap) + cellW / 2;
+      const cy = stripCy;
+      ctx.beginPath();
+      ctx.roundRect(cx - cellW / 2, cy - cellH / 2, cellW, cellH, 5);
+      ctx.fillStyle = c.surface;
+      ctx.fill();
+      ctx.strokeStyle = c.accent;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.fillStyle = c.accent;
+      ctx.font = '700 14px Inter, system-ui';
+      ctx.fillText(block[k], cx, cy + 1);
+    }
+    if (block.length >= 1) {
+      const x0 = stripX0;
+      const x1 = stripX0 + totalBlockW;
+      drawOverbar(ctx, {
+        x0: x0 - 1, x1: x1 + 1, y: stripCy - cellH / 2 - 3, color: c.accent, progress: 1,
+      });
+    }
+    ctx.restore();
+  }
+
+  _drawTopEquationCard(ctx, panel, isE1, alpha) {
+    const c = this.colors;
+    if (alpha <= 0.02) return;
+    const cx = cardCx(panel);
+    const cy = cardCy(panel, 0);
+    const cardLeft = cx - CARD_W / 2;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.roundRect(cardLeft, cy - CARD_H / 2, CARD_W, CARD_H, 10);
+    ctx.fillStyle = c.surface;
+    ctx.fill();
+    ctx.strokeStyle = this._panelEdge();
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    if (isE1) {
+      const eqX = cardLeft + 72; // 202
+      const dotX = 240;
+      const digitStep = 14;
+
+      drawLabelText(ctx, {
+        text: 'x', x: eqX - 22, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '=', x: eqX, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '0', x: dotX - 14, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '.', x: dotX, y: cy + 1,
+        color: c.accent, font: '800 22px Inter, system-ui', align: 'center', alpha,
+      });
+      for (let k = 1; k <= 4; k++) {
+        drawLabelText(ctx, {
+          text: '7', x: dotX + k * digitStep, y: cy + 1,
+          color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+        });
+      }
+      drawLabelText(ctx, {
+        text: '...', x: dotX + 4 * digitStep + 16, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+    } else {
+      const eqX = cardLeft + 78; // 748
+      const dotX = 794;
+      const digitStep = 14;
+
+      drawLabelText(ctx, {
+        text: 'x', x: eqX - 22, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '=', x: eqX, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '0', x: dotX - 14, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '.', x: dotX, y: cy + 1,
+        color: c.accent, font: '800 22px Inter, system-ui', align: 'center', alpha,
+      });
+      const tail = ['2', '7', '2', '7'];
+      for (let k = 0; k < tail.length; k++) {
+        drawLabelText(ctx, {
+          text: tail[k], x: dotX + (k + 1) * digitStep, y: cy + 1,
+          color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+        });
+      }
+      drawLabelText(ctx, {
+        text: '...', x: dotX + 4 * digitStep + 16, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+    }
+    ctx.restore();
+  }
+
+  _drawSubtractArrow(ctx, panel, alpha) {
+    const c = this.colors;
+    if (alpha <= 0.02) return;
+    const cardLeft = cardCx(panel) - CARD_W / 2;
+    const isE1 = panel === 0;
+    const eqX = isE1 ? cardLeft + 72 : cardLeft + 78;
+    const y0 = cardCy(panel, 0) + CARD_H / 2 + 3;
+    const y1 = cardCy(panel, 1) - CARD_H / 2 - 3;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = c.accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(eqX, y0);
+    ctx.lineTo(eqX, y1);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.fillStyle = c.accent;
+    ctx.moveTo(eqX - 5, y1 - 6);
+    ctx.lineTo(eqX + 5, y1 - 6);
+    ctx.lineTo(eqX, y1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    drawLabelText(ctx, {
+      text: '−', x: eqX + 16, y: (y0 + y1) / 2 + 1,
+      color: c.accent, font: '800 18px Inter, system-ui', alpha,
+    });
+  }
+
+  _drawShiftCard(ctx, panel, isE1, alpha, shiftProg) {
+    const c = this.colors;
+    if (alpha <= 0.02) return;
+    const cx = cardCx(panel);
+    const cy = cardCy(panel, 1);
+    const cardLeft = cx - CARD_W / 2;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    // Card frame
+    ctx.beginPath();
+    ctx.roundRect(cardLeft, cy - CARD_H / 2, CARD_W, CARD_H, 10);
+    ctx.fillStyle = c.surface;
+    ctx.fill();
+    ctx.strokeStyle = this._panelEdge();
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    const p = clamp01(shiftProg);
+
+    if (isE1) {
+      // Example 1: 10x = 0.7777... -> 10x = 7.7777... (shift left by 1 digit)
+      const eqX = cardLeft + 72; // 202
+      const dotX = 240;
+      const digitStep = 14;
+
+      drawLabelText(ctx, {
+        text: '10x', x: eqX - 32, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '=', x: eqX, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Fixed decimal dot (aligned with Card 0's dot)
+      drawLabelText(ctx, {
+        text: '.', x: dotX, y: cy + 1,
+        color: c.accent, font: '800 22px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Leading 0 (slides left and fades out)
+      if (p < 0.98) {
+        const x0 = dotX - 14 - p * digitStep;
+        drawLabelText(ctx, {
+          text: '0', x: x0, y: cy + 1,
+          color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha: alpha * (1 - p),
+        });
+      }
+
+      // Digit 1: '7' moves from tenths (dotX + 14) to units (dotX - 14)
+      const x1 = (dotX + 14) - p * 28;
+      const highlight1 = p > 0.05 && p < 0.95;
+      drawLabelText(ctx, {
+        text: '7', x: x1, y: cy + 1,
+        color: highlight1 ? c.accent : c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Digits after dot (tenths, hundredths, thousandths, ten-thousandths)
+      for (let k = 1; k <= 4; k++) {
+        const startX = dotX + (k + 1) * digitStep;
+        const x = startX - p * digitStep;
+        const digitAlpha = k === 4 ? alpha * p : alpha;
+        if (digitAlpha > 0.02) {
+          drawLabelText(ctx, {
+            text: '7', x: x, y: cy + 1,
+            color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha: digitAlpha,
+          });
+        }
+      }
+
+      // Ellipsis
+      drawLabelText(ctx, {
+        text: '...', x: dotX + 4 * digitStep + 16, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Multiplier badge while shifting
+      if (p > 0.02 && p < 0.98) {
+        drawTagPill(ctx, {
+          text: '×10', x: cardLeft + CARD_W - 32, y: cy,
+          bg: c.surface, ink: c.accent, stroke: c.accent, alpha: alpha * Math.sin(Math.PI * p),
+        });
+      }
+    } else {
+      // Example 2: 100x = 0.272727... -> 100x = 27.2727... (shift left by 2 digits)
+      const eqX = cardLeft + 78; // 748
+      const dotX = 794;
+      const digitStep = 14;
+
+      drawLabelText(ctx, {
+        text: '100x', x: eqX - 38, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '=', x: eqX, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Fixed decimal dot (aligned with Card 0's dot)
+      drawLabelText(ctx, {
+        text: '.', x: dotX, y: cy + 1,
+        color: c.accent, font: '800 22px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Leading 0 (slides left and fades out)
+      if (p < 0.98) {
+        const x0 = dotX - 14 - p * digitStep * 2;
+        drawLabelText(ctx, {
+          text: '0', x: x0, y: cy + 1,
+          color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha: alpha * (1 - p),
+        });
+      }
+
+      // Digit '2' (moves from tenths dotX + 14 to tens dotX - 28)
+      const x2 = (dotX + 14) - p * 42;
+      const highlight2 = p > 0.05 && p < 0.95;
+      drawLabelText(ctx, {
+        text: '2', x: x2, y: cy + 1,
+        color: highlight2 ? c.accent : c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Digit '7' (moves from hundredths dotX + 28 to ones dotX - 14)
+      const x7 = (dotX + 28) - p * 42;
+      const highlight7 = p > 0.05 && p < 0.95;
+      drawLabelText(ctx, {
+        text: '7', x: x7, y: cy + 1,
+        color: highlight7 ? c.accent : c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Remaining repeating digits after dot
+      const tail = ['2', '7', '2', '7'];
+      for (let k = 0; k < tail.length; k++) {
+        const startX = dotX + (k + 3) * digitStep;
+        const x = startX - p * 28;
+        const digitAlpha = k >= 2 ? alpha * p : alpha;
+        if (digitAlpha > 0.02) {
+          drawLabelText(ctx, {
+            text: tail[k], x: x, y: cy + 1,
+            color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha: digitAlpha,
+          });
+        }
+      }
+
+      // Ellipsis
+      drawLabelText(ctx, {
+        text: '...', x: dotX + 4 * digitStep + 16, y: cy + 1,
+        color: c.label, font: '700 20px Inter, system-ui', align: 'center', alpha,
+      });
+
+      // Multiplier badge while shifting
+      if (p > 0.02 && p < 0.98) {
+        drawTagPill(ctx, {
+          text: '×100', x: cardLeft + CARD_W - 36, y: cy,
+          bg: c.surface, ink: c.accent, stroke: c.accent, alpha: alpha * Math.sin(Math.PI * p),
+        });
+      }
+    }
+
+    ctx.restore();
+  }
+
+  _drawResultCard(ctx, panel, isE1, alpha) {
+    const c = this.colors;
+    if (alpha <= 0.02) return;
+    const cx = cardCx(panel);
+    const cy = cardCy(panel, 2);
+    const cardLeft = cx - CARD_W / 2;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.roundRect(cardLeft, cy - CARD_H / 2, CARD_W, CARD_H, 10);
+    ctx.fillStyle = c.surface;
+    ctx.fill();
+    ctx.strokeStyle = c.success;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    if (isE1) {
+      const eqX = cardLeft + 72; // 202
+      const dotX = 240;
+
+      drawLabelText(ctx, {
+        text: '9x', x: eqX - 26, y: cy + 1,
+        color: c.success, font: '800 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '=', x: eqX, y: cy + 1,
+        color: c.success, font: '800 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '7', x: dotX - 14, y: cy + 1,
+        color: c.success, font: '800 22px Inter, system-ui', align: 'center', alpha,
+      });
+    } else {
+      const eqX = cardLeft + 78; // 748
+      const dotX = 794;
+
+      drawLabelText(ctx, {
+        text: '99x', x: eqX - 32, y: cy + 1,
+        color: c.success, font: '800 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '=', x: eqX, y: cy + 1,
+        color: c.success, font: '800 20px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '2', x: dotX - 28, y: cy + 1,
+        color: c.success, font: '800 22px Inter, system-ui', align: 'center', alpha,
+      });
+      drawLabelText(ctx, {
+        text: '7', x: dotX - 14, y: cy + 1,
+        color: c.success, font: '800 22px Inter, system-ui', align: 'center', alpha,
+      });
+    }
+    ctx.restore();
+  }
+
+  // ── Example 1 ────────────────────────────────────────────────────────────
+
+  _drawExample1Content(ctx) {
+    const t = this.stepIndex > STEP_E1_BUILD ? 99 : this._stepEnter;
+    const a0 = cruise(clamp01(t / 0.4));
+    const a1 = cruise(clamp01((t - 0.5) / 0.3));
+    const shiftProg = cruise(clamp01((t - 0.9) / 0.7));
+    const aArr = cruise(clamp01((t - 1.7) / 0.4));
+    const aRes = cruise(clamp01((t - 2.2) / 0.4));
+
+    this._drawTopEquationCard(ctx, 0, true, a0);
+    this._drawShiftCard(ctx, 0, true, a1, shiftProg);
+    this._drawSubtractArrow(ctx, 0, aArr);
+    this._drawResultCard(ctx, 0, true, aRes);
+
+    // Beat 1: solved fraction card slots in beside the bottom of example 1 panel
+    if (this.stepIndex >= STEP_MAGNIFY) {
+      const c = this.colors;
+      const tMag = this.stepIndex > STEP_MAGNIFY ? 99 : this._stepEnter;
+      const sFrac = cruise(clamp01((tMag - 0.5) / 0.4));
+      const y = PANEL_Y + PANEL_H - 18;
+      const x = PANEL1_X + PANEL_W / 2;
+      ctx.save();
+      ctx.globalAlpha = sFrac;
+      ctx.beginPath();
+      ctx.roundRect(x - 80, y - 16, 160, 32, 8);
+      ctx.fillStyle = c.surface;
+      ctx.fill();
+      ctx.strokeStyle = c.success;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+      drawLabelText(ctx, {
+        text: 'x = 7/9', x: x, y: y + 1,
+        color: c.success, font: '800 18px Inter, system-ui', align: 'center', alpha: sFrac,
+      });
+    }
+  }
+
+  // ── Magnifier panel (below example 1, beats 1) ──────────────────────────
+
+  _drawMagnifierPanel(ctx) {
+    const c = this.colors;
+    const alpha = cruise(clamp01(this._stepEnter / 0.4));
+    if (alpha <= 0.02) return;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(MAG_X, MAG_Y, MAG_W, MAG_H, 12);
+    ctx.fillStyle = c.surface;
+    ctx.fill();
+    ctx.strokeStyle = this._panelEdge();
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.restore();
+
+    const tailY = MAG_Y + 50;
+    const tailAX = MAG_X + 110;
+    const tailBX = MAG_X + MAG_W - 110;
+    drawLabelText(ctx, {
+      text: '7.7777...', x: tailAX, y: tailY,
+      color: c.label, font: '700 18px Inter, system-ui', align: 'center', alpha,
+    });
+    drawLabelText(ctx, {
+      text: '0.7777...', x: tailBX, y: tailY,
+      color: c.label, font: '700 18px Inter, system-ui', align: 'center', alpha,
+    });
+
+    // Vertical guide lines between them
+    ctx.save();
+    ctx.globalAlpha = alpha * 0.5;
+    ctx.strokeStyle = c.accent;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    for (let k = 0; k < 4; k++) {
+      const x = tailAX + 25 + k * 8;
+      ctx.beginPath();
+      ctx.moveTo(x, tailY - 12);
+      ctx.lineTo(x + (tailBX - tailAX - 50), tailY - 12);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    drawLabelText(ctx, {
+      text: '=', x: MAG_X + MAG_W / 2, y: tailY - 12,
+      color: c.accent, font: '800 20px Inter, system-ui', align: 'center', alpha,
+    });
+    drawTagPill(ctx, {
+      text: 'subtract', x: MAG_X + MAG_W / 2, y: tailY + 22,
+      bg: c.surface, ink: c.accent, stroke: c.accent, alpha,
+    });
+    drawLabelText(ctx, {
+      text: '7', x: MAG_X + MAG_W / 2, y: tailY + 58,
+      color: c.success, font: '800 28px Inter, system-ui', align: 'center', alpha,
+    });
+  }
+
+  // ── Example 2 ────────────────────────────────────────────────────────────
+
+  _drawExample2Content(ctx) {
+    const t = this.stepIndex > STEP_E2_BUILD ? 99 : this._stepEnter;
+    const a0 = cruise(clamp01(t / 0.4));
+    const a1 = cruise(clamp01((t - 0.5) / 0.3));
+    const shiftProg = cruise(clamp01((t - 0.9) / 0.8));
+    const aArr = cruise(clamp01((t - 1.8) / 0.4));
+    const aRes = cruise(clamp01((t - 2.3) / 0.4));
+    const aCancel = cruise(clamp01((t - 2.8) / 0.4));
+    const aFinal = cruise(clamp01((t - 3.3) / 0.4));
+
+    this._drawTopEquationCard(ctx, 1, false, a0);
+    this._drawShiftCard(ctx, 1, false, a1, shiftProg);
+    this._drawSubtractArrow(ctx, 1, aArr);
+    this._drawResultCard(ctx, 1, false, aRes);
+
+    // Cancel stamp: ÷9 between 27/99 -> 3/11 - sits below the right panel
+    if (aCancel > 0.02) {
+      const c = this.colors;
+      drawTagPill(ctx, {
+        text: '÷9', x: CANCEL_X(1), y: CANCEL_Y,
+        bg: c.surface, ink: inkOn(c.surface, c.success, c.label), stroke: c.success,
+        alpha: aCancel,
+      });
+    }
+
+    // Final card: x = 27/99 = 3/11
+    if (aFinal > 0.02) {
+      const c = this.colors;
+      drawTagPill(ctx, {
+        text: 'x = 27/99 = 3/11', x: CANCEL_X(1), y: CANCEL_Y + 38,
+        bg: c.surface, ink: c.success, stroke: c.success,
+        alpha: aFinal,
+      });
+    }
+  }
+}
+
+STEPS[STEP_E1_BUILD].caption = 'One repeating digit needs times ten. Subtract, and nine x equals seven.';
+STEPS[STEP_MAGNIFY].caption = 'The two tails are identical past the decimal point - they cancel, leaving seven.';
+STEPS[STEP_E2_BUILD].caption = 'Two repeating digits need times one hundred. The same moves: shift, subtract, cancel.';

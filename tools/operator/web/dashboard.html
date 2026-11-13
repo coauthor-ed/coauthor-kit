@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kit dashboard</title>
+<style>
+  /* Tokens mirror the authoring app palette (coauthor src/ui/theme.css, body:has(#aa-shell)), light + dark. No raw colours outside this block. */
+  :root { --bg:#f8fafc; --card:#ffffff; --panel:#f1f5f9; --ink:#0f172a; --soft:#334155; --mute:#64748b; --line:#e2e8f0; --line-h:#cbd5e1; --acc:#4f46e5; --acc-h:#4338ca; --acc-l:#eef2ff; --on-acc:#ffffff;
+    --ok:#166534; --okbg:#dcfce7; --warn:#92400e; --warnbg:#fef3c7; --bad:#be123c; --badbg:#ffe4e6; --draftbg:#f1f5f9;
+    --sh-sm:0 1px 2px 0 rgb(0 0 0 / .05); --sh-md:0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#090d16; --card:#131b2e; --panel:#1e293b; --ink:#f8fafc; --soft:#cbd5e1; --mute:#94a3b8; --line:#243047; --line-h:#334155; --acc:#818cf8; --acc-h:#a5b4fc; --acc-l:#1e1b4b; --on-acc:#0f172a;
+    --ok:#34d399; --okbg:rgb(16 185 129 / .2); --warn:#fbbf24; --warnbg:rgb(245 158 11 / .2); --bad:#fb7185; --badbg:rgb(244 63 94 / .2); --draftbg:#1e293b; --sh-sm:0 1px 2px 0 rgb(0 0 0 / .3); --sh-md:0 4px 6px -1px rgb(0 0 0 / .4), 0 2px 4px -2px rgb(0 0 0 / .4); } }
+  :root[data-theme="dark"] { --bg:#090d16; --card:#131b2e; --panel:#1e293b; --ink:#f8fafc; --soft:#cbd5e1; --mute:#94a3b8; --line:#243047; --line-h:#334155; --acc:#818cf8; --acc-h:#a5b4fc; --acc-l:#1e1b4b; --on-acc:#0f172a;
+    --ok:#34d399; --okbg:rgb(16 185 129 / .2); --warn:#fbbf24; --warnbg:rgb(245 158 11 / .2); --bad:#fb7185; --badbg:rgb(244 63 94 / .2); --draftbg:#1e293b; --sh-sm:0 1px 2px 0 rgb(0 0 0 / .3); --sh-md:0 4px 6px -1px rgb(0 0 0 / .4), 0 2px 4px -2px rgb(0 0 0 / .4); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:500 15px/1.5 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif; -webkit-text-size-adjust:100%; }
+  header { padding:10px 16px; display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; border-bottom:1px solid var(--line); background:var(--card); box-shadow:var(--sh-sm); position:sticky; top:0; z-index:5; }
+  header h1 { font-size:1.1rem; font-weight:700; margin:0 8px 0 0; letter-spacing:-.01em; }
+  header #summary { margin-left:auto; }
+  main { max-width:1000px; margin:0 auto; padding:16px; }
+  select, input, button { font:inherit; font-weight:600; color:inherit; background:var(--card); border:1px solid var(--line-h); border-radius:8px; padding:6px 12px; min-height:36px; }
+  input[type=text], input:not([type]), input[inputmode] { min-width:0; }
+  select { max-width:100%; }
+  button { cursor:pointer; transition:transform .12s, box-shadow .12s, border-color .12s; }
+  button:hover { border-color:var(--acc); transform:translateY(-1px); box-shadow:var(--sh-md); }
+  button.primary { background:var(--acc); color:var(--on-acc); border-color:var(--acc); } button.primary:hover { background:var(--acc-h); border-color:var(--acc-h); }
+  :focus-visible { outline:2px solid var(--acc); outline-offset:2px; }
+  .lesson { background:var(--card); border:1px solid var(--line); border-radius:12px; margin:0 0 12px; overflow:hidden; box-shadow:var(--sh-sm); }
+  .lesson[open] { border-color:var(--line-h); }
+  .lesson > summary { list-style:none; cursor:pointer; padding:12px 14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .lesson > summary::-webkit-details-marker { display:none; }
+  .lesson > summary::before { content:""; width:7px; height:7px; flex:none; border-right:2px solid var(--mute); border-bottom:2px solid var(--mute); transform:rotate(-45deg); transition:transform .15s; margin:0 4px 2px 2px; }
+  .lesson[open] > summary::before { transform:rotate(45deg); }
+  .lesson > summary:hover { background:var(--panel); }
+  .lesson details > summary { cursor:pointer; padding:10px 14px; color:var(--soft); font-weight:600; }
+  .title { font-weight:700; flex:1 1 220px; min-width:0; overflow-wrap:anywhere; }
+  .badge { font-size:.78rem; font-weight:700; padding:2px 10px; border-radius:999px; background:var(--draftbg); color:var(--mute); white-space:nowrap; border:1px solid transparent; }
+  .badge.ok { background:var(--okbg); color:var(--ok); } .badge.warn { background:var(--warnbg); color:var(--warn); } .badge.bad { background:var(--badbg); color:var(--bad); }
+  .items { border-top:1px solid var(--line); }
+  .item { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:8px 14px; border-bottom:1px solid var(--line); } .item:last-child { border-bottom:0; }
+  .item:hover { background:var(--panel); }
+  .item .id { flex:1 1 180px; min-width:0; font-family:ui-monospace, 'SF Mono', Menlo, monospace; font-size:.85rem; overflow-wrap:anywhere; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px 14px; border-top:1px solid var(--line); background:var(--panel); }
+  pre { margin:0; padding:10px 14px; background:var(--panel); color:var(--soft); overflow:auto; border-top:1px solid var(--line); white-space:pre-wrap; font-size:12px; }
+  a { color:var(--acc); font-weight:600; } a:hover { color:var(--acc-h); }
+  .filters { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
+  .filters label { display:flex; gap:6px; align-items:center; padding:4px 12px; min-height:34px; border:1px solid var(--line-h); border-radius:999px; background:var(--card); color:var(--soft); font-weight:600; cursor:pointer; }
+  .filters label:has(input:checked) { background:var(--acc-l); border-color:var(--acc); color:var(--acc); }
+  .filters input { min-height:0; accent-color:var(--acc); }
+  .empty { margin:24px 0; padding:28px 16px; text-align:center; color:var(--mute); border:1px dashed var(--line-h); border-radius:12px; background:var(--card); }
+  p.badge.empty { display:block; white-space:normal; font-size:1rem; }
+  #toast { position:fixed; bottom:14px; left:50%; transform:translateX(-50%); max-width:calc(100vw - 24px); background:var(--ink); color:var(--bg); padding:9px 16px; border-radius:10px; font-weight:600; box-shadow:var(--sh-md); opacity:0; transition:opacity .2s; pointer-events:none; z-index:9; } #toast.on { opacity:1; }
+  @media (max-width:560px) { main { padding:10px; } header { padding:8px 10px; } header h1 { flex:1 0 100%; margin:0; } #code { flex:1 1 150px; } #bundle { flex:1 1 110px; } .filters label, button { min-height:40px; } .item .id, .item > span[style] { flex-basis:100%; } .row > button { flex:1 1 auto; } }
+  .cf { display:inline-flex; gap:6px; align-items:center; color:var(--warn); font-weight:700; } [hidden] { display:none !important; }
+  #copybox { position:fixed; left:50%; bottom:60px; transform:translateX(-50%); width:min(560px, calc(100vw - 24px)); background:var(--card); border:1px solid var(--line-h); border-radius:12px; box-shadow:var(--sh-md); padding:10px; z-index:10; }
+  #copybox textarea { width:100%; height:120px; font:12px ui-monospace, Menlo, monospace; color:var(--ink); background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 8px; }
+  #copybox .row { border:0; padding:8px 0 0; background:none; }
+  button.sm { min-height:30px; padding:2px 10px; font-size:.85rem; }
+  #ask { min-width:0; flex:1 1 200px; }
+  .note-text { flex:1 1 100%; min-width:0; overflow-wrap:anywhere; white-space:pre-wrap; color:var(--soft); }
+  .item .nid { flex:none; font-family:ui-monospace, 'SF Mono', Menlo, monospace; font-size:.85rem; font-weight:700; }
+  .acts { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-left:auto; } .acts .cf { flex-wrap:wrap; }
+  .item select { min-height:30px; padding:2px 8px; font-size:.85rem; }
+  .item.done-note { opacity:.62; }
+  .edit { display:flex; flex-wrap:wrap; gap:8px; align-items:center; width:100%; }
+  .edit textarea, .steer textarea { flex:1 1 100%; min-height:84px; font:inherit; font-weight:500; color:var(--ink); background:var(--card); border:1px solid var(--line-h); border-radius:8px; padding:6px 10px; resize:vertical; }
+  .edit input, .steer input { flex:1 1 160px; }
+  .steer { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px 14px; border-top:1px solid var(--line); background:var(--panel); }
+  .unit { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:8px 14px; border-bottom:1px solid var(--line); }
+  .unit.sub { padding-left:34px; } .unit .id { flex:1 1 200px; min-width:0; overflow-wrap:anywhere; }
+  .unit .id code, .item .id code { font-family:ui-monospace, 'SF Mono', Menlo, monospace; font-size:.85rem; }
+  .testout { flex:1 0 100%; margin:4px 0 0; border:1px solid var(--line); border-radius:8px; max-height:280px; }
+  .testout.bad { border-color:var(--bad); } .testout.good { border-color:var(--ok); }
+  .cmd { flex:1 1 100%; font:12px ui-monospace, Menlo, monospace; color:var(--soft); overflow-wrap:anywhere; }
+  .subhead { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:8px 14px; border-bottom:1px solid var(--line); color:var(--soft); }
+  .subhead label { display:flex; gap:6px; align-items:center; cursor:pointer; } .subhead input { min-height:0; accent-color:var(--acc); }
+  .hint { color:var(--mute); font-weight:600; font-size:.88rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kit dashboard</h1>
+  <select id="bundle" aria-label="Bundle"></select>
+  <input id="code" size="13" type="text" autocomplete="off" placeholder="pairing code" aria-label="Pairing code" inputmode="numeric">
+  <input id="ask" type="text" autocomplete="off" placeholder="agent change request (optional)" title="Added to Copy fix context and Copy fix prompt" aria-label="Change request for the agent">
+  <button id="fixall" disabled title="One REVISE prompt with every accepted note of the bundle (model notes need Accept first)">Copy fix prompt</button>
+  <button id="markdone" hidden title="Set the notes of the prompt you just copied to done (they leave the list; Reopen brings one back)">Mark done</button>
+  <button id="theme" title="Toggle theme">Theme</button>
+  <span id="summary" class="badge"></span>
+</header>
+<main>
+  <div class="filters" id="filters">
+    <label><input type="checkbox" data-f="draft"> draft only</label>
+    <label><input type="checkbox" data-f="notes"> notes open</label>
+    <label><input type="checkbox" data-f="look"> look-pending</label>
+    <label><input type="checkbox" data-f="building"> building</label>
+    <label><input type="checkbox" data-f="review"> waiting for your review</label>
+    <label><input type="checkbox" data-f="ready"> ready to review</label>
+  </div>
+  <details class="lesson" id="nextbox" open><summary><span class="title">Next step</span></summary>
+    <div class="subhead"><button class="sm primary" id="nextstep">Next step</button><span class="hint">Shows the next prompt for this course. Copy it and paste it into the agent chat.</span><span class="hint" id="codehint" hidden>Pairing code filled in for you.</span></div>
+    <div class="items" id="next2"></div></details>
+  <details class="lesson" id="notesbox"><summary><span class="title">Review notes and directions</span><span class="badge" id="ncount"></span></summary>
+    <div class="subhead"><label><input type="checkbox" id="showdone"> show done and rejected</label><span class="hint">review-notes.json is plain JSON: you may also edit it by hand.</span></div>
+    <div class="items" id="notes"></div></details>
+  <details class="lesson" id="steerbox"><summary><span class="title">Steer generation</span><span class="badge" id="scount"></span></summary>
+    <div class="subhead"><span class="hint">A direction rides on the next agent run for its unit as "Notes: n4". Bundle-wide ones reach every run. Units appear as soon as the outline or a stub names them.</span></div>
+    <div id="steerall"></div><div class="items" id="plan"></div>
+    <div class="subhead"><b>Next prompts</b><label><input type="checkbox" id="manual"> Review: manual (Stage 3: no tests, shoot or look; you review)</label><button class="sm" id="loadnext">Show</button></div>
+    <div class="items" id="next"></div></details>
+  <div id="list"></div>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="copybox" hidden role="dialog" aria-label="Copy text"><div>Copy did not work here. Select all and copy (Ctrl+C):</div><textarea id="copyta" readonly></textarea><div class="row"><button id="copyclose" class="primary">Close</button></div></div>
+<script>
+const $ = (s) => document.querySelector(s);
+const kit = location.origin;
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+let cfg = {}, data = null, bundle = null, fix = { by: {}, count: 0, unaccepted: 0 }, lastFix = null, plan = null;
+const testRes = {}; // scene src -> { running } | run result (kept across re-renders)
+const KINDS = ['fact', 'pedagogy', 'language', 'bug', 'other', 'direction', 'alternative'], STATES = ['open', 'accepted', 'rejected', 'done'], STAGES = ['', '1a', '1b', '2', '3', '4'];
+const opt = (v, label, sel) => { const o = el('option', { value: v }, label ?? v); if (v === sel) o.selected = true; return o; };
+const sceneLabel = (st) => (st === 'review-pending' ? 'built, waiting for your review' : st || 'scene');
+const nn = (n) => `${n} note${n === 1 ? '' : 's'}`;
+let toastT = 0;
+const toast = (t) => { const e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('on'), 3000); };
+// Copy: async clipboard where available (secure context), else a hidden textarea + execCommand (plain-HTTP LAN), else show the text inline to select.
+async function copyText(text) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); toast('Copied'); return true; } } catch { /* fall through */ }
+  const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.append(ta); ta.select(); ta.setSelectionRange(0, text.length); let ok = false;
+  try { ok = document.execCommand('copy'); } catch { ok = false; } ta.remove();
+  if (ok) { toast('Copied'); return true; }
+  const box = $('#copybox'); $('#copyta').value = text; box.hidden = false; $('#copyta').focus(); $('#copyta').select(); return false;
+}
+// Inline two-step confirm: a button turns into 'Confirm? Yes / Cancel' for 5 s.
+function twoStep(label, cls, q, fn) {
+  const b = el('button', { class: cls }, label), cf = el('span', { class: 'cf', hidden: '' }); let t = 0;
+  const yes = el('button', { class: 'primary' }, 'Yes'), no = el('button', {}, 'Cancel');
+  const off = () => { clearTimeout(t); cf.hidden = true; b.hidden = false; };
+  cf.append(q + ' ', yes, no);
+  b.addEventListener('click', () => { b.hidden = true; cf.hidden = false; yes.focus(); t = setTimeout(off, 5000); });
+  yes.addEventListener('click', () => { off(); fn(); }); no.addEventListener('click', () => { off(); b.focus(); });
+  return [b, cf];
+}
+const H = (u) => u && u.replace(/127\.0\.0\.1|localhost/g, location.hostname);
+const j = (p, o) => fetch(kit + p, o).then(async (r) => { const b = await r.json().catch(() => ({})); if (!r.ok) throw new Error(b.error || r.status); return b; });
+const post = (p, body) => j(p, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Kit-Code': $('#code').value.trim() }, body: JSON.stringify({ bundle, ...body }) });
+const el = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else if (v != null) e.setAttribute(k, v); } for (const k of kids.flat()) e.append(k?.nodeType ? k : document.createTextNode(k ?? '')); return e; };
+const badge = (t, cls = '') => el('span', { class: 'badge ' + cls }, t);
+const filt = () => Object.fromEntries([...document.querySelectorAll('[data-f]')].map((c) => [c.dataset.f, c.checked]));
+
+function lessonVisible(l, f) {
+  if (f.draft && l.approved === l.items.length && l.status === 'human-approved') return false;
+  if (f.notes && !l.notesOpen) return false; if (f.look && !l.lookPending) return false; if (f.building && !l.building) return false; if (f.review && !l.reviewPending) return false;
+  if (f.ready && (l.status === 'human-approved' || l.lookPending || l.building)) return false;
+  return true;
+}
+function render() {
+  const list = $('#list'); list.replaceChildren();
+  if (!data) return;
+  const f = filt(); const total = data.lessons.reduce((a, l) => a + l.items.length, 0), appr = data.lessons.reduce((a, l) => a + l.approved, 0);
+  $('#summary').textContent = `${appr}/${total} items approved - ${data.manifest.status}`;
+  const bc = data.bundleChecks || []; if (bc.length) list.append(el('details', { class: 'lesson' }, el('summary', {}, `Bundle checks: ${bc.map((c) => `${c.check} ${c.fail ? c.fail + ' FAIL ' : ''}${c.warn} WARN`).join(', ')}`), el('pre', {}, bc.map((c) => `${c.check}:\n  ${c.lines.join('\n  ')}`).join('\n')), el('div', { class: 'row' }, el('button', { class: 'sm', onclick: () => copyText(bc.map((c) => `${c.check}:\n  ${c.lines.join('\n  ')}`).join('\n')) }, 'Copy'))));
+  const lessons = [...data.lessons].sort((a, b) => ((a.lookPending || a.building) - (b.lookPending || b.building)) || a.code.localeCompare(b.code));
+  for (const l of lessons.filter((x) => lessonVisible(x, f))) {
+    const open = localStorage.getItem('open:' + bundle + l.code) === '1';
+    const d = el('details', { class: 'lesson' }); if (open) d.open = true;
+    d.addEventListener('toggle', () => store.set('open:' + bundle + l.code, d.open ? '1' : '0'));
+    const checks = l.checks.ran ? (l.checks.fail ? badge(`${l.checks.fail} FAIL`, 'bad') : l.checks.warn ? badge(`${l.checks.warn} WARN`, 'warn') : badge('checks ok', 'ok')) : badge('no check run');
+    d.append(el('summary', {}, el('span', { class: 'title' }, `${l.code} ${l.title}`), l.lookPending ? badge('look-pending', 'warn') : '', l.building ? badge('building', 'warn') : '', l.reviewPending ? badge(`${l.reviewPending} to review`, 'warn') : '', l.steer ? badge(`${l.steer} steer`) : '', l.notesOpen ? badge(`${l.notesOpen} notes`, 'warn') : '', checks, badge(`${l.approved}/${l.items.length}`, l.approved === l.items.length && l.status === 'human-approved' ? 'ok' : '')));
+    const items = el('div', { class: 'items' });
+    for (const it of l.items) {
+      const sc = it.scene, rp = sc?.status === 'review-pending';
+      const row = el('div', { class: 'item' }, el('span', { class: 'id' }, `S${String(it.n).padStart(2, '0')} ${it.id}`), sc ? badge(sceneLabel(sc.status), sc.status === 'done' ? 'ok' : 'warn') : '', it.notes ? badge(`${it.notes} note`, 'warn') : '', badge(it.status === 'human-approved' ? 'approved' : 'draft', it.status === 'human-approved' ? 'ok' : ''),
+        it.link ? el('a', { href: H(it.link), target: '_blank', rel: 'noopener' }, 'open') : '',
+        it.link ? el('a', { href: `/frame.html?src=${encodeURIComponent(H(it.link))}&device=phone`, target: '_blank' }, 'phone') : '',
+        el('button', { onclick: () => copyCtx(it.scope) }, 'copy fix context'),
+        sc?.tests ? el('button', { class: rp ? 'primary' : '', onclick: () => runTests(sc.src), disabled: testRes[sc.src]?.running ? '' : null, title: 'Run the scene\'s Must-get-right tests file here (pass/fail shown below)' }, testRes[sc.src]?.running ? 'Running tests...' : 'Run tests') : '',
+        rp ? el('button', { onclick: () => markReviewed(sc.src), title: 'Set the scene Status to done' }, 'Mark reviewed') : '',
+        rp && !sc.tests ? el('span', { class: 'hint' }, 'no tests file') : '');
+      const tr = sc && testRes[sc.src];
+      if (tr && !tr.running) row.append(testBox(tr, it.scope, sc.src));
+      items.append(row);
+    }
+    const cl = l.checks.lines || []; const cdet = cl.length ? el('details', {}, el('summary', {}, `Check details (${cl.length} shown)`), el('pre', {}, cl.join('\n')), el('div', { class: 'row' }, el('button', { class: 'sm', onclick: () => copyText(cl.join('\n')) }, 'Copy'))) : '';
+    d.append(items, cdet, el('div', { class: 'row' },
+      twoStep(`Approve ${l.code}`, 'primary', `Approve all of ${l.code}?`, () => act('approve', { lesson: l.code }, `${l.code} approved`)),
+      twoStep('Unapprove', '', `Send ${l.code} back to draft?`, () => act('unapprove', { lesson: l.code }, `${l.code} back to draft`)),
+      l.link ? el('a', { href: H(l.link), target: '_blank', rel: 'noopener' }, 'open lesson') : '',
+      fix.by[l.code] ? el('button', { onclick: () => copyFix(l.code), title: `One REVISE prompt with the accepted notes of ${l.code}` }, `Copy fix prompt (${nn(fix.by[l.code])})`) : '',
+      el('button', { onclick: () => copyCtx(l.code) }, 'copy fix context')));
+    list.append(d);
+  }
+  if (!list.children.length) list.append(el('p', { class: 'badge empty' }, 'Nothing matches these filters. Clear a filter above to see more.'));
+}
+async function copyCtx(scope) {
+  try {
+    const { text } = await j(`/_kit/context?bundle=${encodeURIComponent(bundle)}&scope=${scope}&do=${encodeURIComponent($('#ask').value.trim())}`);
+    await copyText(text);
+  } catch (e) { toast(e.message); }
+}
+// One REVISE prompt from the accepted review notes (all lessons, or one); the change request box is appended as 'Also:'.
+async function copyFix(lesson) {
+  try {
+    const r = await j(`/_kit/fixprompt?bundle=${encodeURIComponent(bundle)}&combined=1${lesson ? `&lesson=${encodeURIComponent(lesson)}` : ''}&do=${encodeURIComponent($('#ask').value.trim())}`);
+    if (!r.count) return toast('no accepted notes');
+    lastFix = { ids: r.ids }; showMarkDone();
+    if (await copyText(r.text)) toast(`Copied fix prompt (${nn(r.count)})`);
+  } catch (e) { toast(e.message); }
+}
+// Mark these N done: exactly the ids the last copied fix prompt held.
+function showMarkDone() { const b = $('#markdone'); b.hidden = !lastFix?.ids?.length; if (lastFix) b.textContent = lastFix.ids.length === 1 ? 'Mark this note done' : `Mark these ${lastFix.ids.length} done`; }
+async function markDone() {
+  if (!lastFix?.ids?.length) return; if (!needCode()) return;
+  try { const r = await post('/_kit/notes/state', { ids: lastFix.ids, state: 'done' }); toast(`${r.updated} note(s) done`); lastFix = null; showMarkDone(); load(); } catch (e) { toast(e.message); }
+}
+const needCode = () => { if ($('#code').value.trim()) { store.set('code:' + kit, $('#code').value.trim()); return true; } $('#code').focus(); toast('type the pairing code first'); return false; };
+// ---- scene tests (Review: manual scenes) ----
+async function runTests(src) {
+  if (!needCode()) return; testRes[src] = { running: true }; render();
+  try { testRes[src] = await post('/_kit/runtests', { src }); } catch (e) { testRes[src] = { ok: false, summary: e.message, fails: [], output: '' }; }
+  render(); toast(testRes[src].summary || 'done');
+}
+function testBox(tr, scope, src) {
+  const box = el('div', { class: 'edit' }, badge(tr.summary || (tr.ok ? 'PASS' : 'FAIL'), tr.ok ? 'ok' : 'bad'),
+    tr.fails?.length ? el('button', { class: 'sm', onclick: () => failNotes(tr, scope), title: 'One bug note on this slide with every failing line' }, 'Add failures as notes') : '',
+    tr.cmd ? el('button', { class: 'sm', onclick: () => copyText(tr.cmd), title: tr.cmd }, 'Copy command') : '',
+    el('button', { class: 'sm', onclick: () => { delete testRes[src]; render(); } }, 'Hide'),
+    tr.output ? el('pre', { class: 'testout ' + (tr.ok ? 'good' : 'bad') }, tr.output) : '');
+  return box;
+}
+async function failNotes(tr, scope) {
+  if (!needCode()) return;
+  try { const n = await post('/_kit/notes', { scope, kind: 'bug', text: `Must-get-right tests failed (${tr.cmd.split(' ').find((x) => /\//.test(x) && !x.startsWith('tools')) || 'scene'}): ${tr.fails.join(' | ')}`.slice(0, 2000) }); toast(`note ${n.id} saved`); load(); } catch (e) { toast(e.message); }
+}
+async function markReviewed(src) {
+  if (!needCode()) return;
+  try { await post('/_kit/scene/reviewed', { src }); toast('marked reviewed: Status done'); load(); } catch (e) { toast(e.message); }
+}
+async function loadFix() {
+  const r = await j(`/_kit/fixprompt?bundle=${encodeURIComponent(bundle)}`);
+  fix = { by: Object.fromEntries(r.prompts.map((x) => [x.lesson, x.ids.length])), count: r.count, unaccepted: r.unaccepted || 0 };
+  const b = $('#fixall'); b.disabled = !fix.count; b.textContent = `Copy fix prompt (${nn(fix.count)})`;
+}
+async function act(kind, scope, msg) {
+  if (!$('#code').value.trim()) { $('#code').focus(); return toast('type the pairing code first'); }
+  try { store.set('code:' + kit, $('#code').value.trim()); const r = await post('/_kit/' + kind, scope); toast(`${msg} (${r.changed} files)`); load(); } catch (e) { toast(e.message); }
+}
+// Notes list: every note (directions too); done and rejected only with 'show done'. Each row: state, Copy, Edit (inline), Delete (two-step).
+async function loadNotes() {
+  const all = await j('/_kit/notes?bundle=' + encodeURIComponent(bundle));
+  const c = (st) => all.filter((n) => n.state === st).length, dirs = all.filter((n) => n.kind === 'direction' && n.state === 'accepted').length;
+  $('#ncount').textContent = `${c('open')} open, ${c('accepted')} accepted, ${c('done')} done${c('rejected') ? `, ${c('rejected')} rejected` : ''}${dirs ? ` (${dirs} directions)` : ''}${fix.unaccepted ? ` - ${fix.unaccepted} to accept (fix prompts use accepted notes only)` : ''}`;
+  const showAll = $('#showdone').checked; const box = $('#notes'); box.replaceChildren();
+  const ns = all.filter((n) => showAll || n.state === 'open' || n.state === 'accepted');
+  if (!ns.length) box.append(el('div', { class: 'item' }, el('span', { class: 'hint' }, all.length ? 'No open notes. Tick "show done and rejected" to see the rest.' : 'No notes yet.')));
+  for (const n of ns) box.append(noteRow(n));
+}
+async function setState(n, state) { if (!needCode()) return; try { await post('/_kit/notes/state', { ids: [n.id], state }); load(); } catch (e) { toast(e.message); } }
+function noteRow(n) {
+  const row = el('div', { class: 'item' + (n.state === 'done' || n.state === 'rejected' ? ' done-note' : '') });
+  const sel = el('select', { 'aria-label': `State of ${n.id}`, title: 'open / accepted (goes in fix prompts) / rejected / done' }, STATES.map((x) => opt(x, x, n.state)));
+  sel.addEventListener('change', () => setState(n, sel.value));
+  const [del, delcf] = twoStep('Delete', 'sm', `Delete ${n.id}?`, async () => { if (!needCode()) return; try { await post('/_kit/notes/delete', { id: n.id }); toast(`${n.id} deleted`); load(); } catch (e) { toast(e.message); } });
+  row.append(el('span', { class: 'nid' }, `${n.id} ${n.scope}`), badge(n.kind, n.kind === 'direction' ? 'ok' : ''), n.stage ? badge(`stage ${n.stage}`) : '', n.source === 'model' ? badge('model', 'warn') : '', sel);
+  row.append(el('span', { class: 'acts' },
+    el('button', { class: 'sm', onclick: () => copyText(n.text), title: 'Copy note text' }, 'Copy'),
+    n.state === 'open' ? el('button', { class: 'sm primary', onclick: () => setState(n, 'accepted') }, 'Accept') : '',
+    n.state === 'done' || n.state === 'rejected' ? el('button', { class: 'sm', onclick: () => setState(n, 'accepted'), title: 'Back to accepted' }, 'Reopen') : el('button', { class: 'sm', onclick: () => setState(n, 'done') }, 'Done'),
+    el('button', { class: 'sm', onclick: () => row.replaceWith(noteEditor(n)) }, 'Edit'), del, delcf), el('span', { class: 'note-text' }, n.text));
+  return row;
+}
+function noteEditor(n) {
+  const ta = el('textarea', { 'aria-label': 'Note text' }); ta.value = n.text;
+  const kind = el('select', { 'aria-label': 'Kind' }, KINDS.map((k) => opt(k, k, n.kind)));
+  const scope = el('input', { type: 'text', 'aria-label': 'Scope', value: n.scope, placeholder: 'L02S03, L02, L02/Scene or bundle', autocomplete: 'off' });
+  const stage = el('select', { 'aria-label': 'Stage (directions)', title: 'Directions only: the stage it targets (any = every stage)' }, STAGES.map((x) => opt(x, x ? `stage ${x}` : 'any stage', n.stage || '')));
+  const sync = () => { stage.hidden = kind.value !== 'direction'; }; kind.addEventListener('change', sync); sync();
+  const box = el('div', { class: 'item' }, el('div', { class: 'edit' }, el('span', { class: 'id' }, `Edit ${n.id}`), ta, kind, scope, stage,
+    el('button', { class: 'primary', onclick: async () => {
+      if (!needCode()) return;
+      try { await post('/_kit/notes/edit', { id: n.id, text: ta.value, kind: kind.value, scope: scope.value, ...(kind.value === 'direction' ? { stage: stage.value || null } : {}) }); toast(`${n.id} saved`); load(); } catch (e) { toast(e.message); }
+    } }, 'Save'),
+    el('button', { onclick: () => box.replaceWith(noteRow(n)) }, 'Cancel')));
+  setTimeout(() => ta.focus(), 0);
+  return box;
+}
+// ---- steer: directions for units that may not exist yet (outline lessons, stubs) ----
+function steerForm(scopeVal, label) {
+  const ta = el('textarea', { 'aria-label': `Direction for ${scopeVal}`, placeholder: 'What should the agent do (or avoid) for this unit? It wins over the stub or outline.' });
+  const scope = el('input', { type: 'text', value: scopeVal, 'aria-label': 'Scope', title: 'bundle, L02, L02S03 or L02/SceneName', autocomplete: 'off' });
+  const stage = el('select', { 'aria-label': 'Stage', title: 'Only for this stage (any = the next run for this unit, whatever its stage)' }, STAGES.map((x) => opt(x, x ? `stage ${x}` : 'any stage', '')));
+  const f = el('div', { class: 'steer' }, el('span', { class: 'id' }, label), ta, scope, stage,
+    el('button', { class: 'primary', onclick: async () => {
+      if (!ta.value.trim()) { ta.focus(); return toast('write the direction first'); } if (!needCode()) return;
+      try { const n = await post('/_kit/notes', { scope: scope.value, kind: 'direction', stage: stage.value || null, text: ta.value }); toast(`direction ${n.id} saved (accepted)`); load(); } catch (e) { toast(e.message); }
+    } }, 'Save direction'),
+    el('button', { onclick: () => f.remove() }, 'Cancel'));
+  setTimeout(() => ta.focus(), 0);
+  return f;
+}
+const steerBtn = (host, scopeVal, label) => el('button', { class: 'sm', onclick: () => { const nx = host.nextElementSibling; if (nx?.classList.contains('steer')) return nx.querySelector('textarea').focus(); host.after(steerForm(scopeVal, label)); } }, 'Steer');
+function renderPlan() {
+  const box = $('#plan'); box.replaceChildren(); if (!plan) return;
+  const dirs = plan.directions.filter((d) => d.state === 'accepted');
+  const count = (pred) => dirs.filter(pred).length;
+  $('#scount').textContent = `${dirs.length} active direction${dirs.length === 1 ? '' : 's'}`;
+  const all = el('div', { class: 'unit' }, el('span', { class: 'id' }, el('b', {}, 'Whole bundle'), ' (every run)'), count((d) => d.scope === 'bundle') ? badge(`${count((d) => d.scope === 'bundle')} steer`, 'ok') : '');
+  all.append(steerBtn(all, 'bundle', 'Whole bundle')); $('#steerall').replaceChildren(all);
+  for (const l of plan.lessons) {
+    const lc = count((d) => d.scope.split('/')[0].replace(/S\d+$/, '') === l.code);
+    const r = el('div', { class: 'unit' }, el('span', { class: 'id' }, el('code', {}, l.code), ` ${l.title}`), badge(l.built ? 'built' : 'outline only', l.built ? 'ok' : ''), lc ? badge(`${lc} steer`, 'ok') : '');
+    r.append(steerBtn(r, l.code, `${l.code} (lesson, its slides and scenes)`)); box.append(r);
+    for (const sc of l.scenes) {
+      const k = `${l.code}/${sc.name}`, n = count((d) => d.scope === k);
+      const sr = el('div', { class: 'unit sub' }, el('span', { class: 'id' }, el('code', {}, sc.name)), badge(sc.status === 'fresh' ? 'stub only' : sceneLabel(sc.status), sc.status === 'done' ? 'ok' : sc.status === 'fresh' ? '' : 'warn'), n ? badge(`${n} steer`, 'ok') : '');
+      sr.append(steerBtn(sr, k, `${k} (scene)`)); box.append(sr);
+    }
+  }
+}
+async function loadPlan() { try { plan = await j('/_kit/plan?bundle=' + encodeURIComponent(bundle)); renderPlan(); } catch (e) { plan = null; } }
+async function loadNext(sel = '#next') {
+  const box = $(sel); box.replaceChildren(el('div', { class: 'item' }, el('span', { class: 'hint' }, 'Asking next.mjs...')));
+  try {
+    const r = await j(`/_kit/next?bundle=${encodeURIComponent(bundle)}${$('#manual').checked ? '&review=manual' : ''}`); box.replaceChildren();
+    if (!r.units.length) box.append(el('div', { class: 'item' }, el('span', { class: 'hint' }, `Nothing to hand out now (stage ${r.stage}).`)));
+    for (const u of r.units) box.append(el('div', { class: 'item' }, el('span', { class: 'id' }, u.label), el('button', { class: 'sm primary', onclick: () => copyText(u.prompt) }, 'Copy prompt'), el('div', { class: 'cmd' }, u.prompt)));
+  } catch (e) { box.replaceChildren(el('div', { class: 'item' }, el('span', { class: 'hint' }, e.message))); }
+}
+async function load() { if (!bundle) return; data = await j('/_kit/status?bundle=' + encodeURIComponent(bundle)); await loadFix().catch(() => {}); render(); loadNotes(); loadPlan(); }
+(async () => {
+  $('#copyclose').onclick = () => { $('#copybox').hidden = true; };
+  cfg = await j('/_kit/config'); const sel = $('#bundle');
+  if (!cfg.bundles.length) { $('#list').replaceChildren(el('div', { class: 'empty' }, 'No bundles found. The kit serves only courses/<bundle>/ (with a bundle.json or lessons/). Put a bundle there, for example: ', el('code', {}, 'ln -s ../examples/work-energy courses/work-energy'), ' ', el('button', { class: 'sm', onclick: () => copyText('ln -s ../examples/work-energy courses/work-energy') }, 'Copy'), ' then reload.')); return; }
+  for (const b of cfg.bundles) sel.append(el('option', { value: b }, b));
+  bundle = store.get('bundle:' + kit) && cfg.bundles.includes(store.get('bundle:' + kit)) ? store.get('bundle:' + kit) : cfg.bundles[0]; sel.value = bundle || '';
+  sel.onchange = () => { bundle = sel.value; store.set('bundle:' + kit, bundle); lastFix = null; showMarkDone(); $('#next').replaceChildren(); $('#next2').replaceChildren(); load(); };
+  $('#code').value = store.get('code:' + kit) || '';
+  try { const c = await j('/_kit/code'); if (c.code) { $('#code').value = c.code; store.set('code:' + kit, c.code); $('#codehint').hidden = false; } } catch { /* code is shown only in the browser-workspace mode */ }
+  document.querySelectorAll('[data-f]').forEach((c) => c.addEventListener('change', render));
+  $('#theme').onclick = () => { const t = (document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; store.set('theme', t); };
+  if (store.get('theme')) document.documentElement.dataset.theme = store.get('theme');
+  new EventSource(kit + '/_kit/events').onmessage = (ev) => { try { if (JSON.parse(ev.data).bundle !== bundle) return; } catch { /* untagged */ } load(); };
+  $('#fixall').onclick = () => copyFix(null); $('#markdone').onclick = markDone;
+  $('#showdone').checked = store.get('showdone') === '1'; $('#showdone').onchange = () => { store.set('showdone', $('#showdone').checked ? '1' : '0'); loadNotes(); };
+  $('#loadnext').onclick = () => loadNext(); $('#nextstep').onclick = () => loadNext('#next2'); $('#manual').checked = store.get('manual') === '1'; $('#manual').onchange = () => { store.set('manual', $('#manual').checked ? '1' : '0'); if ($('#next').children.length) loadNext(); };
+  addEventListener('focus', () => load()); // notes taken in the review panel do not fire events (review-notes.json is not watched)
+  load();
+})();
+</script>
+</body>
+</html>

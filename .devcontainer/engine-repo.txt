@@ -1,0 +1,3 @@
+# One line: git URL of the CoAuthor engine. Lines starting with # are ignored.
+# Optional "#ref" suffix picks a branch or tag.
+https://github.com/coauthor-ed/coauthor

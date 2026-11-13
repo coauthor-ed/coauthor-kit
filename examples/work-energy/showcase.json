@@ -1,0 +1,74 @@
+{
+  "tagline": {
+    "en": "Pushing a wall all day: is that work?"
+  },
+  "description": {
+    "en": "A first lesson on what work means in physics, with a simulation on almost every slide. You learn to tell when a force does work, and when it does not."
+  },
+  "tags": [
+    "physics",
+    "grade 9",
+    "work and energy",
+    "simulations"
+  ],
+  "cover": "showcase/shot-1.jpg",
+  "intro": "showcase/intro.md",
+  "shots": [
+    {
+      "scope": "L01S01",
+      "beat": 0,
+      "caption": "Three slides, one platform"
+    },
+    {
+      "scope": "L01S03",
+      "beat": 0,
+      "caption": "Push the wall, work stays zero"
+    },
+    {
+      "scope": "L01S05",
+      "beat": 1,
+      "caption": "Carry a box, turn the push"
+    },
+    {
+      "scope": "L01S07",
+      "beat": 2,
+      "caption": "Four ways to lift the sacks"
+    },
+    {
+      "scope": "L01S10",
+      "beat": 0,
+      "caption": "Work as a shaded area"
+    },
+    {
+      "scope": "L01S12",
+      "beat": 1,
+      "caption": "Stopping the ball: negative work"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "showcase/shot-1.jpg",
+      "caption": "Three slides, one platform"
+    },
+    {
+      "src": "showcase/shot-2.jpg",
+      "caption": "Push the wall, work stays zero"
+    },
+    {
+      "src": "showcase/shot-3.jpg",
+      "caption": "Carry a box, turn the push"
+    },
+    {
+      "src": "showcase/shot-4.jpg",
+      "caption": "Four ways to lift the sacks"
+    },
+    {
+      "src": "showcase/shot-5.jpg",
+      "caption": "Work as a shaded area"
+    },
+    {
+      "src": "showcase/shot-6.jpg",
+      "caption": "Stopping the ball: negative work"
+    }
+  ]
+}

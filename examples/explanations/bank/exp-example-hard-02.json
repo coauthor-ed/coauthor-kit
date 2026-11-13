@@ -1,0 +1,16 @@
+{
+  "id": "exp-example-hard-02",
+  "type": "content-block@1",
+  "markdown": {
+    "en": "**Step 2 - eliminate T.** Add both equations: 2g = 10a, so a = g/5 = 2 m/s^2. Watch the system settle into this acceleration below."
+  },
+  "simulation": {
+    "src": "simulations/AtwoodMachineScene.js",
+    "position": "right"
+  },
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

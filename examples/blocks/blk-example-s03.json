@@ -1,0 +1,11 @@
+{
+  "id": "blk-example-s03",
+  "type": "content-block@1",
+  "markdownRef": "blocks/blk-example-s03.md",
+  "poeRole": "explain",
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-08-07T15:54:12.012Z"
+  }
+}

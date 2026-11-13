@@ -1,0 +1,84 @@
+import { DomSimulation } from 'simulations/base/DomSimulation.js';
+
+/**
+ * AbsolutePositionedScene - the DOM anti-pattern: reimplementing canvas
+ * coordinates in DOM instead of letting the browser lay anything out,
+ * paying canvas's costs (hand-tuned positions, text that can still overflow
+ * or collide) with none of the benefit (nothing here actually reflows).
+ * Every number below was picked to "look right" at one specific viewport
+ * width - see README.md for exactly what breaks and why.
+ *
+ * DO NOT COPY. `../simulations/ShiftSubtractScene.js` is the fix for this
+ * exact failure mode - same "labelled equation cards" content shape, real
+ * flex/grid layout, ported from a canvas original rather than backslid into
+ * one.
+ */
+
+const W = 900;
+const H = 400;
+
+export class AbsolutePositionedScene extends DomSimulation {
+  static WIDTH = W;
+  static HEIGHT = H;
+
+  async setup() {
+    await super.setup();
+    this.injectStyle(`
+      .sim-dom-root { background: var(--sim-bg-deep); position: relative; }
+      /* Every box below is position:absolute with a hand-picked left/top -
+         exactly the canvas ctx.fillText(x, y) pattern this base class exists
+         to get away from, just spelled in CSS instead of a draw call. */
+      .box {
+        position: absolute;
+        background: var(--sim-bg-surface);
+        border: 1px solid var(--sim-accent);
+        border-radius: 8px;
+        color: var(--sim-label);
+        font: 700 16px Inter, system-ui;
+        padding: 8px 14px;
+        /* No width/max-width/white-space rule at all - a longer authored
+           string (a translated label, a bigger number) has nowhere to go
+           but past this box's edge, silently, with no error anywhere. */
+        white-space: nowrap;
+      }
+      .arrow {
+        position: absolute; left: 430px; top: 90px;
+        color: var(--sim-accent); font: 800 20px Inter, system-ui;
+      }
+    `);
+
+    const top = document.createElement('div');
+    top.className = 'box';
+    top.style.left = '120px';
+    top.style.top = '40px';
+    top.textContent = 'x = 0.7777...';
+    this.root.appendChild(top);
+
+    const shift = document.createElement('div');
+    shift.className = 'box';
+    // Picked to sit just to the right of `top` at THIS one label's width -
+    // change the label above by even one character and this either
+    // overlaps it or leaves a gap, and nothing here would ever tell you.
+    shift.style.left = '380px';
+    shift.style.top = '40px';
+    shift.textContent = '10x = 7.7777...';
+    this.root.appendChild(shift);
+
+    const arrow = document.createElement('div');
+    arrow.className = 'arrow';
+    arrow.textContent = '− (subtract)';
+    this.root.appendChild(arrow);
+
+    const result = document.createElement('div');
+    result.className = 'box';
+    // Vertically centered under `top` and `shift` only by eye, against
+    // this one viewport's own two box heights - a longer wrapped label
+    // above changes both boxes' heights and this number stops meaning
+    // anything, silently.
+    result.style.left = '250px';
+    result.style.top = '160px';
+    result.style.borderColor = 'var(--sim-success)';
+    result.textContent = '9x = 7';
+    this.root.appendChild(result);
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "epi-curve@1",
+  "title": "epi-curve@1 data",
+  "description": "An epidemic curve: cases by day or hour of symptom onset. Content only: no sizes, colours or coordinates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bins"],
+  "$defs": {
+    "text": { "oneOf": [ { "type": "string", "minLength": 1 }, { "type": "object", "required": ["en"], "properties": { "en": { "type": "string", "minLength": 1 } } } ] },
+    "step": { "type": "integer", "minimum": 1, "maximum": 9, "description": "1-based beat this part appears at; default 1" },
+    "count": { "type": "integer", "minimum": 0 }
+  },
+  "properties": {
+    "unit": { "enum": ["day", "hour"], "default": "day", "description": "Used in the screen-reader sentence." },
+    "yTitle": { "$ref": "#/$defs/text", "description": "Kicker above the y axis; default Cases.", "maxLength": 24 },
+    "xTitle": { "$ref": "#/$defs/text", "description": "Line under the x axis, e.g. Date of symptom onset." },
+    "series": {
+      "type": "array", "minItems": 2, "maxItems": 4,
+      "description": "Stacked groups, bottom first. Leave out for one group.",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["label"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "$ref": "#/$defs/text" },
+          "tone": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "step": { "$ref": "#/$defs/step" }
+        }
+      }
+    },
+    "bins": {
+      "type": "array", "minItems": 3, "maxItems": 60,
+      "description": "One bin per day or hour, in order, including empty ones.",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["label"],
+        "properties": {
+          "label": { "$ref": "#/$defs/text", "description": "Axis label, unique, e.g. 12 Jun or 08:00." },
+          "count": { "$ref": "#/$defs/count", "description": "Cases (no series)." },
+          "counts": { "type": "array", "items": { "$ref": "#/$defs/count" }, "description": "Cases per series, same order as series." },
+          "step": { "$ref": "#/$defs/step" }
+        }
+      }
+    },
+    "exposure": {
+      "type": "object", "additionalProperties": false, "required": ["at", "label"],
+      "properties": {
+        "at": { "$ref": "#/$defs/text", "description": "A bin label." },
+        "label": { "$ref": "#/$defs/text", "description": "Short, e.g. Wedding lunch." },
+        "step": { "$ref": "#/$defs/step" }
+      }
+    },
+    "incubation": {
+      "type": "object", "additionalProperties": false, "required": ["to", "label"],
+      "description": "Bracket from the exposure to a later bin (the peak or the bulk of onsets). Needs exposure.",
+      "properties": {
+        "to": { "$ref": "#/$defs/text", "description": "A bin label after the exposure." },
+        "label": { "$ref": "#/$defs/text", "description": "e.g. About 2 days." },
+        "step": { "$ref": "#/$defs/step" }
+      }
+    },
+    "notes": {
+      "type": "array", "maxItems": 3,
+      "description": "Numbered marks over bins, explained under the chart.",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["at", "text"],
+        "properties": {
+          "at": { "$ref": "#/$defs/text", "description": "A bin label." },
+          "label": { "$ref": "#/$defs/text", "description": "Kicker, e.g. Peak." },
+          "text": { "$ref": "#/$defs/text", "description": "One short line." },
+          "step": { "$ref": "#/$defs/step" }
+        }
+      }
+    }
+  }
+}

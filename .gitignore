@@ -1,0 +1,5 @@
+build/
+compose*.yml
+*.swp
+/migration/
+.cache/

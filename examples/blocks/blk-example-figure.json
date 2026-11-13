@@ -1,0 +1,65 @@
+{
+  "id": "blk-example-figure",
+  "type": "content-block@1",
+  "markdown": {
+    "en": "## Only the disease-free and comparable may enter\n\nA cohort study has five elements, in this order.\n\n<!-- STEP -->\n\nBefore anyone joins, they must pass the **entry conditions**. Fail any one and the person stays out."
+  },
+  "figure": {
+    "layout": "steps",
+    "caption": "Five elements of a cohort study. Nobody joins the cohort without passing the gate.",
+    "tab": "Case file 5 / cohorts",
+    "items": [
+      {
+        "id": "sel",
+        "title": "Select the subjects",
+        "text": "General population or a special group: doctors, insured persons, employees.",
+        "step": 1
+      },
+      {
+        "id": "exp",
+        "title": "Get exposure data",
+        "step": 1
+      },
+      {
+        "id": "cmp",
+        "title": "Select comparison groups",
+        "step": 1
+      },
+      {
+        "id": "fu",
+        "title": "Follow up",
+        "step": 1
+      },
+      {
+        "id": "an",
+        "title": "Analyse",
+        "step": 1
+      }
+    ],
+    "gate": {
+      "after": "sel",
+      "title": "Entry conditions",
+      "items": [
+        "Free of the disease",
+        "Equally susceptible",
+        "Comparable on other variables",
+        "Criteria fixed beforehand"
+      ],
+      "step": 2
+    },
+    "notes": [
+      {
+        "on": "gate",
+        "label": "The gate",
+        "text": "Fail any one and the person stays out.",
+        "step": 2
+      }
+    ],
+    "position": "right"
+  },
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

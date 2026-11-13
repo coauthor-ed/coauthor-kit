@@ -1,0 +1,26 @@
+{
+  "id": "blk-example-s02",
+  "type": "poe-predict@1",
+  "promptRef": "blocks/blk-example-s02.md",
+  "options": [
+    {
+      "id": "a",
+      "text": "Yes - muscle fibers alone create movement, so the arm lifts normally."
+    },
+    {
+      "id": "b",
+      "text": "No - without that connection, muscle force never reaches the bone."
+    },
+    {
+      "id": "c",
+      "text": "The arm moves faster, since there's less holding it back."
+    }
+  ],
+  "correctOptionId": "b",
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-08-07T15:54:12.011Z"
+  },
+  "deferVerdict": true
+}

@@ -1,0 +1,34 @@
+{
+  "id": "q-l01-s05",
+  "type": "numeric-value@1",
+  "difficulty": "medium",
+  "bloomLevel": "apply",
+  "stem": {
+    "en": "A goalkeeper stops a ball by applying a force of 200 N. The catch drives her hands backwards by 15 cm from where they met the ball. Find the work done by the goalkeeper on the ball, in joules, and give it with its sign."
+  },
+  "expectedValue": -30,
+  "tolerance": 1,
+  "unit": "J",
+  "explanation": {
+    "en": "Her hands are driven backwards, opposite to the direction of her push, so the displacement along the force is negative: -15 cm = -0.15 m. So W = 200 N x (-0.15 m) = -30 J. The sign is negative because the force and the displacement are opposite."
+  },
+  "hints": [
+    {
+      "en": "Write the displacement along the force first, and give it a sign. Her hands move opposite to her push, so it is negative."
+    },
+    {
+      "en": "Convert 15 cm to metres before multiplying: 15 cm = 0.15 m."
+    }
+  ],
+  "tags": [
+    "work",
+    "sign-of-work",
+    "goalkeeper"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-10-13T01:26:25.218Z",
+    "reviewedBy": "review-bar"
+  }
+}

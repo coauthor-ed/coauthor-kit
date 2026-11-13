@@ -1,0 +1,23 @@
+{
+  "id": "tissues-in-action",
+  "moduleId": "tissues-in-action",
+  "type": "module",
+  "authorId": "<your-bundle-name>",
+  "title": {
+    "en": "Tissues in Action"
+  },
+  "curriculumAlignment": "core",
+  "pedagogicalProfile": {
+    "themeTags": [
+      "meristematic-tissue"
+    ]
+  },
+  "lessons": [
+    {
+      "lessonRef": "lessons/les-01.json",
+      "title": {
+        "en": "Why doesn't adding more identical cells solve every problem?"
+      }
+    }
+  ]
+}

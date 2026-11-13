@@ -1,0 +1,41 @@
+{
+  "id": "q-reflection-distance",
+  "type": "numeric-value@1",
+  "difficulty": "easy",
+  "bloomLevel": "apply",
+  "stem": {
+    "en": "Point A(3, 4) is reflected across the y-axis to produce point A' (shown in the graph). What is the distance between A and A', in units?"
+  },
+  "graph": {
+    "points": [
+      { "x": 3, "y": 4, "label": "A" },
+      { "x": -3, "y": 4, "label": "A'" }
+    ],
+    "xDomain": [-6, 6],
+    "yDomain": [-2, 8],
+    "xLabel": "x",
+    "yLabel": "y",
+    "a11yCaption": "Point A at (3, 4) and its reflection A prime at (-3, 4), both on the horizontal line y = 4."
+  },
+  "expectedValue": 6,
+  "tolerance": 0.1,
+  "unit": "units",
+  "explanation": {
+    "en": "Reflecting a point across the y-axis keeps its distance from that axis but flips which side it's on: the y-coordinate stays the same and the x-coordinate changes sign, so A(3, 4) becomes A'(-3, 4). Both points lie on the same horizontal line y = 4, so the distance between them is just the difference in x-coordinates: 3 - (-3) = 6 units."
+  },
+  "hints": [
+    {
+      "en": "A and A' lie on the same horizontal line - the distance between them is just how far apart their x-coordinates are."
+    }
+  ],
+  "tags": [
+    "coordinate-geometry",
+    "reflections",
+    "graphing"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-09-15T00:00:00.000Z"
+  }
+}

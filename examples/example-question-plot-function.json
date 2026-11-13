@@ -1,0 +1,40 @@
+{
+  "id": "q-plot-uniform-motion",
+  "type": "plot-function@1",
+  "difficulty": "medium",
+  "bloomLevel": "apply",
+  "stem": {
+    "en": "A cyclist starts 1 m from a lamp post and rides away from it at a constant 2 m/s. Plot the cyclist's distance from the lamp post (in metres) for at least three different times between t = 0 s and t = 3 s."
+  },
+  "targetFunction": "2*x + 1",
+  "xLabel": "Time (s)",
+  "yLabel": "Distance from lamp post (m)",
+  "xDomain": [
+    0,
+    3
+  ],
+  "yDomain": [
+    0,
+    8
+  ],
+  "minPoints": 3,
+  "tolerance": 0.5,
+  "explanation": {
+    "en": "Constant speed means distance grows by the same amount every second - distance = starting distance + speed × time, so distance = 1 + 2t. At t = 0, 1, 2, 3 s the cyclist is 1, 3, 5, 7 m away: every point you plot should sit on that straight line."
+  },
+  "hints": [
+    {
+      "en": "Distance = starting distance + (speed × time). Work out the distance at t = 0 s first - that's where the line starts."
+    }
+  ],
+  "tags": [
+    "motion",
+    "graphing",
+    "linear-function"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-08-19T00:00:00.000Z"
+  }
+}

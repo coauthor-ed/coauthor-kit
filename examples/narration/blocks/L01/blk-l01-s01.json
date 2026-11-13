@@ -1,0 +1,52 @@
+{
+  "id": "blk-l01-s01",
+  "type": "poe-predict@1",
+  "promptRef": "blocks/L01/blk-l01-s01.md",
+  "options": [
+    {
+      "id": "a",
+      "text": "\"Smoking is dangerous to the health of smokers.\""
+    },
+    {
+      "id": "b",
+      "text": "\"Cigarette smoking causes lung cancer.\""
+    },
+    {
+      "id": "c",
+      "text": "\"Smoking 30-40 cigarettes a day causes lung cancer in 10 per cent of smokers after 20 years.\""
+    },
+    {
+      "id": "d",
+      "text": "\"People with lung cancer smoke more than other people do.\""
+    }
+  ],
+  "correctOptionId": "c",
+  "narrationCover": {
+    "prompt": {
+      "src": "media/01-desk.jpg",
+      "alt": "An investigator's desk: a stack of five closed case files under a lamp, an open file with a clipped note, a magnifying glass, a pencil, a cup of tea and a rubber stamp.",
+      "frames": [
+        {},
+        {
+          "x": 0.32,
+          "y": 0.38,
+          "w": 0.58,
+          "h": 0.58,
+          "ms": 1800,
+          "t": 200
+        },
+        {
+          "x": 0.6,
+          "y": 0.38,
+          "w": 0.26,
+          "h": 0.26,
+          "ms": 2500,
+          "t": 2600
+        }
+      ]
+    }
+  },
+  "authoring": {
+    "status": "ai-draft"
+  }
+}

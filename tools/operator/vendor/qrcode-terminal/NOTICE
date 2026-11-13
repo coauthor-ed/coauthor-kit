@@ -1,0 +1,2 @@
+qrcode-terminal 0.12.0 (Michael Brooks), Apache License 2.0, vendored unmodified (lib/, vendor/QRCode/ derived from
+Kazuhiko Arase's QRCode for JavaScript, MIT). Used only by tools/operator/preview.mjs to print a QR code in the terminal.

@@ -1,0 +1,15 @@
+{
+  "id": "blk-l02-s01",
+  "type": "content-block@1",
+  "markdownRef": "blocks/blk-example-sim-history-map.md",
+  "simulation": {
+    "src": "simulations/L02/HarappanRegionMapScene.js",
+    "position": "right"
+  },
+  "mediaStep": 0,
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

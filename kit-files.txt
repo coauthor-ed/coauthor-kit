@@ -1,0 +1,21 @@
+# Kit-owned files, rsync filter syntax. First match wins.
+# Manual sync: rsync -a --filter='merge kit-files.txt' <master>/ ./   (see for-the-human-operator.txt)
+# kit-sync.mjs reads this same file. Anything not listed is workspace-owned and never touched.
++ /briefs/***
++ /tools/***
++ /docs/***
++ /packs/***
++ /validators/***
++ /simulations-kit/***
++ /examples/***
++ /renderers/***
++ /.agents/***
++ /.devcontainer/***
++ /LICENSE
++ /AGENTS.md
++ /CLAUDE.md
++ /START-HERE.md
++ /REVISE.md
++ /kit-files.txt
++ /for-the-human-operator.txt
+- *

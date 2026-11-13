@@ -1,0 +1,29 @@
+{
+  "id": "les-01",
+  "lessonId": "les-01",
+  "type": "lesson",
+  "title": {
+    "en": "Why doesn't adding more identical cells solve every problem?"
+  },
+  "blocks": [
+    {
+      "blockRef": "blocks/L01/blk-example-s01.json"
+    },
+    {
+      "blockRef": "blocks/L01/blk-example-s02.json"
+    },
+    {
+      "blockRef": "blocks/L01/blk-example-s03.json"
+    },
+    {
+      "blockRef": "questions/L01/q-l01-s04.json"
+    }
+  ],
+  "flow": {},
+  "authoring": {
+    "status": "human-approved",
+    "reviewedBy": null,
+    "flags": [],
+    "reviewedAt": "2026-08-07T15:54:11.981Z"
+  }
+}

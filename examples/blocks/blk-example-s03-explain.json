@@ -1,0 +1,10 @@
+{
+  "id": "blk-example-s03-explain",
+  "type": "poe-explain@1",
+  "promptRef": "blocks/blk-example-s03-explain.md",
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-08-18T00:00:00.000Z"
+  }
+}

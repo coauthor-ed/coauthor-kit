@@ -1,0 +1,49 @@
+{
+  "id": "blk-l02-s02",
+  "type": "content-block@1",
+  "markdownRef": "blocks/blk-example-sim-history-images.md",
+  "image": {
+    "src": "media/L02/l02s02_b02.jpg",
+    "alt": "A painted illustration of a Harappan-era farming village beside a river, blending into a map of the Indus and Sarasvatī river system across the Indian subcontinent.",
+    "position": "right"
+  },
+  "simulation": {
+    "src": "simulations/L02/HarappanCityPlanScene.js",
+    "position": "right"
+  },
+  "mediaStep": 0,
+  "simulationStep": 7,
+  "reveal": {
+    "images": {
+      "phases": {
+        "src": "media/L02/l02s02_b03.jpg",
+        "alt": "An illustrated three-panel infographic showing the Pre-Harappan, Early Harappan, and Mature Harappan phases as increasingly organised settlements - from a farming village, to a fortified town, to a planned grid city."
+      },
+      "bhirrana": {
+        "src": "media/L02/l02s02_b04.jpg",
+        "alt": "A photograph of the actual Bhirrana potsherd, showing an incised graffiti drawing of a dancing figure with one hand on the hip."
+      },
+      "kunal": {
+        "src": "media/L02/l02s02_b05.jpg",
+        "alt": "An illustration of a Harappan-era metalworking scene: two ornate silver tiaras, a pile of colourful beads, copper arrowheads, and a craftsman working at a furnace outside mud-brick dwellings."
+      },
+      "bricks": {
+        "src": "media/L02/l02s02_b06.jpg",
+        "alt": "An illustration of Harappan brick-makers at work, with inset diagrams showing the 1:2:4 brick ratio, header and stretcher brick courses, and a site-distribution map, over a view of a brick city street."
+      },
+      "citadel": {
+        "src": "media/L02/l02s02_b07.jpg",
+        "alt": "An aerial illustration of the Mohenjo-daro Citadel: a raised platform with the sunken Great Bath, a pillared hall, and a granary, beside the gridded rooftops of the Lower Town and a river in the distance."
+      },
+      "lowertown": {
+        "src": "media/L02/l02s02_b08.jpg",
+        "alt": "A street-level illustration of the Harappan Lower Town: a paved main street, houses with doorways and storage jars, a public well with people drawing water, and inset close-ups of a covered drain and an inspection sump."
+      }
+    }
+  },
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

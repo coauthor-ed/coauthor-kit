@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simulation Preview Harness</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  Minimal standalone preview for one course-exclusive simulation scene, with
+  NO dependency on the rest of the engine (no Lit, no LessonEngine, no
+  content-block.js). It reproduces just enough of what content-block.js
+  actually does when it mounts a beat-synced simulation (see
+  src/plugins/blocks/content-block/content-block.js in the engine repo):
+  instantiate the scene, setup()/start()/resume() it, and drive it forward
+  with Prev/Next buttons that call onBeatChange(beatIndex, beatCount) exactly
+  the way a real lesson slide's own beat navigation does.
+
+  Open this file directly in a browser (double-click it) for a plain scene.
+
+  A scene touching `/vendor/...` (SimGeo maps, or a WebGLSimulation 3D
+  scene) needs real HTTP instead, rooted at THIS folder: `cd
+  simulations-kit && python3 -m http.server`. Root-absolute imports and
+  SimGeo's `fetch('/vendor/...')` calls don't resolve under file://, and
+  vendor/ must be reachable at exactly `/vendor/...` - don't root the
+  server one level up at `content-repo-template/`.
+
+  `examples/` is not under this folder (there is no symlink any more): the
+  kit preview server (`node tools/operator/preview.mjs`) maps `/examples`
+  to `../examples`; with a plain `python3 -m http.server` only scenes
+  inside this folder resolve.
+
+  No build step, no install either way.
+
+  To preview your own scene, pass it in the URL instead of editing this
+  file: ?sim=examples/simulations/YourScene.js&beats=3. See
+  DEFAULT_SCENE_PATH/DEFAULT_BEAT_COUNT below for resolution + fallback
+  behavior.
+-->
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #0a0f1e; color: #e2e8f0; }
+  body > header { padding: 14px 18px; background: #111827; border-bottom: 1px solid #1e3a5f; }
+  body > header h1 { font-size: 1rem; margin: 0; }
+  body > header p { margin: 4px 0 0; font-size: 0.8rem; color: #94a3b8; }
+  #stage { max-width: 920px; margin: 20px auto; }
+  #sim-host { width: 100%; line-height: 0; border-radius: 8px; overflow: hidden; background: #0d1b2a; }
+  #sim-host canvas { width: 100%; height: auto; display: block; }
+  /* DomSimulation scenes (src/simulations/base/DomSimulation.js) build real
+     text nodes inside .sim-dom-root - the line-height:0 above (which
+     collapses whitespace around a <canvas>) collapses DOM text just as
+     badly, so it's restored here, scoped to that one class. */
+  #sim-host .sim-dom-root { line-height: normal; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 4px; }
+  button { padding: 8px 14px; border-radius: 6px; border: none; background: #3b82f6; color: white; font-weight: 600; cursor: pointer; font-family: inherit; }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .beat-indicator { font-size: 0.85rem; color: #94a3b8; margin-left: auto; }
+  #controls { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 10px 4px; border-top: 1px solid #1e3a5f; margin-top: 10px; }
+  #controls label { font-size: 0.85rem; }
+  #status { padding: 8px 4px; font-size: 0.8rem; color: #6ee7b7; min-height: 1.2em; }
+  #error { padding: 12px; background: #3f1d1d; color: #fca5a5; border-radius: 6px; white-space: pre-wrap; font-family: monospace; font-size: 0.8rem; }
+</style>
+<link rel="stylesheet" href="./vendor/fonts/app-fonts.css">
+<link rel="stylesheet" href="./src/simulations/base/sim-theme.css">
+<link rel="stylesheet" href="./src/core/quill/quill-theme.css">
+<link rel="stylesheet" href="./src/core/looks/look-tokens.css">
+<script type="importmap">
+{
+  "imports": {
+    "simulations/base/": "./src/simulations/base/",
+    "/vendor/": "./vendor/"
+  }
+}
+</script>
+</head>
+<body>
+<header>
+  <h1>Simulation Preview Harness</h1>
+  <p>Drives a scene's <code>onBeatChange(beatIndex, beatCount)</code> exactly like a real lesson slide would. Not a substitute for checking inside the real engine - see docs/simulation-authoring.md.</p>
+</header>
+<div id="stage">
+  <div id="error" style="display:none"></div>
+  <div id="sim-host"></div>
+  <div class="row">
+    <button id="btn-prev">&larr; Prev beat</button>
+    <button id="btn-next">Next beat &rarr;</button>
+    <button id="btn-theme"></button>
+    <span class="beat-indicator" id="beat-indicator"></span>
+  </div>
+  <div id="controls"></div>
+  <div id="status"></div>
+</div>
+
+<script type="module">
+  import { mountControlsDom } from 'simulations/base/SimControls.js';
+  // ── Preview via ?sim=&beats=, or edit the DEFAULT_* lines below ─────────
+  // http://localhost:PORT/preview-harness.html?sim=examples/simulations/YourScene.js&beats=3
+  // `sim` resolves relative to this file (stay inside `simulations-kit/` -
+  // see top comment). Bare `examples/...` works too, normalized below.
+  // Omit either param to fall back to DEFAULT_*, so no query string still
+  // previews the canonical example.
+  const DEFAULT_SCENE_PATH = './examples/simulations/TriangleHalfParallelogramScene.js';
+  const DEFAULT_BEAT_COUNT = 4; // how many lesson-text beats this scene's onBeatChange should expect (see BEAT_STEP_MAP in the example)
+
+  const params = new URLSearchParams(window.location.search);
+  const rawSim = params.get('sim');
+  const normalizeSimPath = (p) => (/^(\.\/|\/|https?:\/\/)/.test(p) ? p : `./${p}`);
+  const SCENE_PATH = rawSim ? normalizeSimPath(rawSim) : DEFAULT_SCENE_PATH;
+  const parsedBeats = parseInt(params.get('beats'), 10);
+  const BEAT_COUNT = Number.isFinite(parsedBeats) && parsedBeats > 0 ? parsedBeats : DEFAULT_BEAT_COUNT;
+  // ──────────────────────────────────────────────────────────────────────
+
+  // Extra query params, used by tools/sim-test/sim-layout.mjs and handy by hand:
+  //   portrait=1  mount as a narrow/portrait host (config.isPortrait = true)
+  //   hostw=380   fixed host width in px (default: the harness column width)
+  //   beat=N      start on beat N
+  //   theme=light|dark  sim colour theme (default dark); the Theme button reloads with the other one
+  const PORTRAIT = params.get('portrait') === '1';
+  const HOST_W = parseInt(params.get('hostw'), 10);
+  const START_BEAT = Math.max(0, parseInt(params.get('beat'), 10) || 0);
+  // Set before the scene loads: scenes read their colours once at setup, so switching means a reload.
+  const THEME = params.get('theme') === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = THEME;
+  const host = document.getElementById('sim-host');
+  if (Number.isFinite(HOST_W) && HOST_W > 0) host.style.width = HOST_W + 'px';
+  const errorBox = document.getElementById('error');
+  const statusBox = document.getElementById('status');
+  const beatIndicator = document.getElementById('beat-indicator');
+  const controlsBox = document.getElementById('controls');
+
+  let scene = null;
+  let SceneClass = null;
+  let beatIndex = START_BEAT;
+
+  function showError(err) {
+    errorBox.style.display = 'block';
+    errorBox.textContent = String(err?.stack || err);
+    console.error(err);
+  }
+
+  // One shared renderer (src/simulations/base/SimControls.js): a new control type is added
+  // there once and every preview page and the lint get it.
+  function renderControls() {
+    mountControlsDom(controlsBox, SceneClass, scene, { rerender: renderControls });
+  }
+
+  function updateBeatUI() {
+    beatIndicator.textContent = `beat ${beatIndex + 1} of ${BEAT_COUNT}`;
+    document.getElementById('btn-prev').disabled = beatIndex === 0;
+    document.getElementById('btn-next').disabled = beatIndex === BEAT_COUNT - 1;
+  }
+
+  async function loadGlossary(url) {
+    const map = new Map();
+    if (!url) return map;
+    try {
+      const en = (v) => (v && typeof v === 'object' ? v.en : v) || '';
+      for (const t of (await (await fetch(url)).json()).terms || []) {
+        map.set(t.id, { id: t.id, term: t.term, plain: en(t.plain), means: en(t.means), face: t.face || null,
+          roots: (t.roots || []).map((r) => ({ part: r.part, means: en(r.means) })) });
+      }
+    } catch { /* scene shows its own "needs the glossary" note */ }
+    return map;
+  }
+
+  // subject=<id>, else the subject in the scene's own course manifest.json (the folder above its
+  // simulations/): the --sim-subject the app sets on a scene host, so maths scenes get the kit's graph paper.
+  // setting=<name>, else the manifest's simSetting: --sim-setting, the faint setting behind canvas scenes.
+  // look=<id>, else the manifest's look: --sim-look, the LookProfile the kit draws with (none: quill).
+  // accent=<name>, else the manifest's accent: html[data-accent], the course signature colour (--sim-annot) a look's css keys on.
+  async function markSubject() {
+    let s = params.get('subject') || '', set = params.get('setting') || '', look = params.get('look') || '', accent = params.get('accent') || '';
+    const at = SCENE_PATH.lastIndexOf('/simulations/');
+    if (at > 0 && (!s || !set || !look || !accent)) {
+      try { const r = await fetch(new URL(SCENE_PATH.slice(0, at) + '/manifest.json', location.href)); if (r.ok) { const m = await r.json(); s ||= String(m.subject || ''); set ||= String(m.simSetting || ''); look ||= String(m.look || ''); accent ||= String(m.accent || ''); } } catch { /* no manifest: default paper */ }
+    }
+    if (/^[a-z][a-z0-9-]*$/i.test(accent)) document.documentElement.dataset.accent = accent.toLowerCase();
+    if (/^[a-z][a-z0-9-]*$/i.test(s)) host.style.setProperty('--sim-subject', s);
+    if (/^[a-z][a-z0-9-]*$/i.test(set)) host.style.setProperty('--sim-setting', set);
+    if (/^[a-z][a-z0-9-]*$/i.test(look)) host.style.setProperty('--sim-look', look);
+    // A look's scene colours (look-tokens.css, generated from the engine's look css) key on html[data-look], as in the app.
+    if (/^[a-z][a-z0-9-]*$/i.test(look) && look.toLowerCase() !== 'quill') document.documentElement.dataset.look = look.toLowerCase();
+  }
+
+  async function boot() {
+    try {
+      // Canvas text never repaints when a face arrives late: load both faces before the scene draws.
+      try { await Promise.all(['400 16px Nunito', '700 16px Nunito', '800 16px Nunito', '600 16px Fredoka', '700 16px Fredoka'].map((f) => document.fonts.load(f))); } catch { /* fall back */ }
+      const module = await import(SCENE_PATH);
+      SceneClass = Object.values(module).find((v) => typeof v === 'function' && v.prototype);
+      if (!SceneClass) throw new Error('No exported class found in ' + SCENE_PATH);
+
+      statusBox.textContent = `Loaded ${SceneClass.name} from ${SCENE_PATH} (${BEAT_COUNT} beats)`;
+
+      // glossary=<url of a course glossary.json> gives glossary-driven scenes
+      // (NameDecoderScene) the same config.glossaryTerm() the lesson host supplies.
+      const glossary = await loadGlossary(params.get('glossary'));
+      // fieldguide=<url of field-guide.json> and a localStorage collection serve the kit's games.
+      let guide = null;
+      try { if (params.get('fieldguide')) guide = await (await fetch(params.get('fieldguide'))).json(); } catch { /* scene explains */ }
+      const { Collection } = await import('simulations/base/kit/Collection.js');
+      await markSubject();
+      scene = new SceneClass(host, { ...(params.has('portrait') ? { isPortrait: PORTRAIT } : {}), glossaryTerm: (id) => glossary.get(id) || null, fieldGuide: () => guide, collection: Collection.local('kit-harness-collection') });
+      window.__scene = scene;
+      scene.requestUiUpdate = renderControls;
+      scene.allowResume = true;
+      await scene.setup();
+
+      // Same call order as content-block.js's _mountSimulation(): sync to
+      // the current beat once mounted, then start the render loop if the
+      // scene has one (a purely discrete/InteractiveSceneBase scene won't).
+      scene.onBeatChange?.(beatIndex, BEAT_COUNT);
+      if (typeof scene.start === 'function') scene.start();
+      if (typeof scene.resume === 'function') scene.resume();
+
+      renderControls();
+      updateBeatUI();
+      window.__ready = true;
+    } catch (err) {
+      showError(err);
+    }
+  }
+
+  document.getElementById('btn-prev').onclick = () => {
+    beatIndex = Math.max(0, beatIndex - 1);
+    scene?.onBeatChange?.(beatIndex, BEAT_COUNT);
+    updateBeatUI();
+    renderControls();
+  };
+  document.getElementById('btn-next').onclick = () => {
+    beatIndex = Math.min(BEAT_COUNT - 1, beatIndex + 1);
+    scene?.onBeatChange?.(beatIndex, BEAT_COUNT);
+    updateBeatUI();
+    renderControls();
+  };
+
+  const themeBtn = document.getElementById('btn-theme');
+  themeBtn.textContent = THEME === 'light' ? 'Dark theme' : 'Light theme';
+  themeBtn.onclick = () => {
+    const q = new URLSearchParams(window.location.search);
+    q.set('theme', THEME === 'light' ? 'dark' : 'light');
+    q.set('beat', String(beatIndex));
+    window.location.search = q.toString();
+  };
+
+  boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "id": "blk-l01-s02",
+  "type": "poe-predict@1",
+  "promptRef": "blocks/L01/blk-l01-s02.md",
+  "options": [
+    {
+      "id": "a",
+      "text": "A lot of it - ten minutes of that hard, and the effort was certainly not free."
+    },
+    {
+      "id": "b",
+      "text": "None at all - the wall never moved, and the wall is the thing the work would have been done on."
+    },
+    {
+      "id": "c",
+      "text": "It depends how hard you pushed - a bigger force over a longer time means more work."
+    }
+  ],
+  "correctOptionId": "b",
+  "deferVerdict": true,
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-10-13T01:25:10.458Z",
+    "reviewedBy": "review-bar"
+  }
+}

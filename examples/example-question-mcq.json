@@ -1,0 +1,43 @@
+{
+  "id": "blk-l07-s11",
+  "type": "mcq-single@2",
+  "difficulty": "medium",
+  "bloomLevel": "evaluate",
+  "stem": {
+    "en": "Compare three microscopic arrangements: long parallel fibres, tapering spindle-shaped cells and short branching cells."
+  },
+  "options": [
+    {
+      "id": "a",
+      "text": {
+        "en": "Long parallel fibres are best suited to shortening strongly in one main direction to pull skeletal levers across joints."
+      },
+      "isCorrect": true
+    },
+    {
+      "id": "b",
+      "text": {
+        "en": "Tapering spindle-shaped cells are better suited to squeezing the wall of a hollow organ."
+      },
+      "isCorrect": false
+    },
+    {
+      "id": "c",
+      "text": {
+        "en": "Short branching cells are best suited to pulling skeletal levers because branching increases strength."
+      },
+      "isCorrect": false
+    }
+  ],
+  "correctOptionId": "a",
+  "explanation": {
+    "en": "Use structure, not memorisation, to justify your decision."
+  },
+  "hints": [],
+  "tags": [],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-08-07T15:54:12.009Z"
+  }
+}

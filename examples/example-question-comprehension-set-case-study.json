@@ -1,0 +1,83 @@
+{
+  "id": "q-case-study-separation-of-powers",
+  "type": "comprehension-set@1",
+  "difficulty": "medium",
+  "passageTitle": {
+    "en": "Ideas Behind Modern Democratic Government"
+  },
+  "passage": {
+    "en": "Several Enlightenment thinkers questioned the belief that a king's power came from God and could never be challenged. John Locke argued against this, insisting that a ruler held power only with the consent of the people governed. Building on this, Jean-Jacques Rousseau described government as resting on an agreement between citizens and those who represented them. Baron de Montesquieu went further still, arguing that government power should never sit in one pair of hands - he proposed splitting it into three separate branches: one to make laws, one to enforce them, and one to judge disputes under them. This three-way split was first put into practice in the United States, once its thirteen colonies broke away from British rule. The success of the American system, and the rights it guaranteed its citizens, later shaped how political thinkers in France imagined their own government."
+  },
+  "items": [
+    {
+      "id": "i1",
+      "weight": 1,
+      "question": {
+        "id": "q-case-study-separation-of-powers-i1",
+        "type": "semantic-descriptive@1",
+        "prompt": { "en": "Which thinker proposed dividing government power into three separate branches?" },
+        "rubric": [
+          {
+            "id": "montesquieu",
+            "label": { "en": "Montesquieu proposed the three-way separation of powers" },
+            "level1": { "en": "Which philosopher argued against all power sitting in one pair of hands?" },
+            "clue": { "en": "He is associated with splitting government into lawmaking, enforcing, and judging branches." },
+            "level2Template": { "en": "___ proposed dividing government power into three separate branches." },
+            "accepted": ["montesquieu", "baron de montesquieu"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "i2",
+      "weight": 1,
+      "question": {
+        "id": "q-case-study-separation-of-powers-i2",
+        "type": "semantic-descriptive@1",
+        "prompt": { "en": "Where was this three-branch model of government first put into practice?" },
+        "rubric": [
+          {
+            "id": "usa",
+            "label": { "en": "The United States, after its thirteen colonies broke from Britain" },
+            "level1": { "en": "Which country's break from British rule gave this model its first real test?" },
+            "clue": { "en": "Thirteen former British colonies became this country." },
+            "level2Template": { "en": "The three-branch model was first put into practice in the ___." },
+            "accepted": ["united states", "usa", "america", "the thirteen colonies"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "i3",
+      "weight": 2,
+      "question": {
+        "id": "q-case-study-separation-of-powers-i3",
+        "type": "semantic-descriptive@1",
+        "prompt": { "en": "What did Rousseau say about the relationship between citizens and their government, and whose earlier idea did he build on?" },
+        "rubric": [
+          {
+            "id": "social-contract",
+            "label": { "en": "Rousseau described government as an agreement between citizens and their representatives" },
+            "level1": { "en": "According to Rousseau, what kind of relationship exists between the people and those who govern them?" },
+            "clue": { "en": "Think of it as a two-way agreement, not power simply handed down from above." },
+            "level2Template": { "en": "Rousseau described government as resting on an ___ between citizens and their representatives." },
+            "accepted": ["agreement", "social contract", "contract"]
+          },
+          {
+            "id": "builds-on-locke",
+            "label": { "en": "He built on John Locke's argument that rulers govern only with the people's consent" },
+            "level1": { "en": "Whose earlier argument, that a ruler needs the people's consent, did Rousseau build on?" },
+            "clue": { "en": "He argued against the idea that a king's power came from God alone." },
+            "level2Template": { "en": "Rousseau built on the earlier ideas of ___." },
+            "accepted": ["locke", "john locke"]
+          }
+        ]
+      }
+    }
+  ],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

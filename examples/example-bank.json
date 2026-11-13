@@ -1,0 +1,33 @@
+{
+  "id": "bank-laws-of-motion-grade11-demo",
+  "type": "question-bank@1",
+  "subject": "physics",
+  "grade": 11,
+  "chapterId": "laws-of-motion",
+  "title": {
+    "en": "Laws of Motion - Practice Question Bank"
+  },
+  "questions": [
+    {
+      "ref": "questions/bank/q-bank-001.json",
+      "type": "mcq-single@2",
+      "topicId": "newtons-second-law",
+      "difficulty": "easy",
+      "weight": 1,
+      "estimatedTimeSec": 75
+    },
+    {
+      "ref": "questions/bank/q-bank-014.json",
+      "type": "numeric-value@1",
+      "topicId": "connected-systems",
+      "difficulty": "hard",
+      "weight": 1,
+      "estimatedTimeSec": 180
+    }
+  ],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

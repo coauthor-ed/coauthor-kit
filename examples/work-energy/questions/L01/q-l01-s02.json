@@ -1,0 +1,31 @@
+{
+  "id": "q-l01-s02",
+  "type": "numeric-value@1",
+  "difficulty": "easy",
+  "bloomLevel": "apply",
+  "stem": {
+    "en": "Take $g = 10\\ \\mathrm{m\\ s^{-2}}$. A sack of mass 5 kg rests on the floor and is lifted slowly, at constant speed, until it stands 1 m above the floor. How much work is done in lifting it? Give the answer in joules."
+  },
+  "expectedValue": 50,
+  "tolerance": 1,
+  "unit": "J",
+  "explanation": {
+    "en": "Lifting at constant speed means the upward force equals the weight, F = mg = 5 x 10 = 50 N. The sack is displaced 1 m upward, along that force, so W = F x s = 50 N x 1 m = 50 J."
+  },
+  "hints": [
+    {
+      "en": "Constant speed means zero acceleration, so the upward force must exactly balance the weight."
+    }
+  ],
+  "tags": [
+    "work",
+    "weight",
+    "vertical-lift"
+  ],
+  "authoring": {
+    "status": "human-approved",
+    "flags": [],
+    "reviewedAt": "2026-10-13T01:26:01.665Z",
+    "reviewedBy": "review-bar"
+  }
+}

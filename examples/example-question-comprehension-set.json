@@ -1,0 +1,63 @@
+{
+  "id": "q-power-of-small-acts",
+  "type": "comprehension-set@1",
+  "difficulty": "medium",
+  "passageTitle": { "en": "The Power of Small Acts" },
+  "passage": {
+    "en": "Often, we associate greatness with grand gestures or large-scale accomplishments. However, true impact often lies in the smallest of actions. A smile offered to a stranger, a helping hand to a neighbour, or a kind word shared during a tough day can create ripples of positivity.\n\nMoreover, small acts foster a sense of community. When one person helps another, it creates a chain of kindness. A child helped with homework may grow up to mentor others."
+  },
+  "items": [
+    {
+      "id": "i1",
+      "weight": 1,
+      "question": {
+        "id": "q-power-of-small-acts-i1",
+        "type": "mcq-single@2",
+        "stem": { "en": "According to the passage, what is the real source of impactful change?" },
+        "options": [
+          { "id": "a", "text": { "en": "Grand gestures by influential people" } },
+          { "id": "b", "text": { "en": "Consistent, small actions performed with empathy" } },
+          { "id": "c", "text": { "en": "Public recognition and awards" } },
+          { "id": "d", "text": { "en": "Sudden changes made by powerful leaders" } }
+        ],
+        "correctOptionId": "b"
+      }
+    },
+    {
+      "id": "i2",
+      "weight": 1,
+      "question": {
+        "id": "q-power-of-small-acts-i2",
+        "type": "fill-blank@2",
+        "template": { "en": "The word in the passage that means the opposite of 'neglect' is: {a}" },
+        "blanks": [
+          { "id": "a", "expected": ["helping", "help", "kindness"] }
+        ]
+      }
+    },
+    {
+      "id": "i3",
+      "weight": 2,
+      "question": {
+        "id": "q-power-of-small-acts-i3",
+        "type": "semantic-descriptive@1",
+        "prompt": { "en": "What is meant by 'ripples of positivity' in the context of small actions?" },
+        "rubric": [
+          {
+            "id": "chain-effect",
+            "label": { "en": "One kind act inspires further kind acts, spreading outward like a ripple" },
+            "level1": { "en": "Describe how a single kind act leads to more kindness." },
+            "clue": { "en": "Think of a ripple spreading outward from a single point on water." },
+            "level2Template": { "en": "A single kind act can spread outward and inspire others to act with ___ in turn." },
+            "accepted": ["kindness", "compassion", "empathy"]
+          }
+        ]
+      }
+    }
+  ],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "bundleId": "narration",
+  "title": "narration showcase",
+  "subject": "epidemiology",
+  "grade": "UG",
+  "description": "Kit example: a narrated predict with an opening picture and a narrated scene (docs/narration.md).",
+  "icon": "",
+  "tags": [],
+  "publicPath": "narration",
+  "subjectPack": "epidemiology",
+  "visualProfile": "lite",
+  "look": "plain"
+}

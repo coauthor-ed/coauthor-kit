@@ -1,0 +1,33 @@
+{
+  "id": "q-needs-vs-wants",
+  "type": "match-categorize@1",
+  "difficulty": "easy",
+  "bloomLevel": "understand",
+  "stem": {
+    "en": "Sort each item into Needs or Wants."
+  },
+  "categories": [
+    { "id": "needs", "label": { "en": "Needs" } },
+    { "id": "wants", "label": { "en": "Wants" } }
+  ],
+  "chips": [
+    { "id": "chip-water", "text": { "en": "Drinking water" }, "correctCategoryId": "needs" },
+    { "id": "chip-shelter", "text": { "en": "A place to live" }, "correctCategoryId": "needs" },
+    { "id": "chip-staple-food", "text": { "en": "Rice and lentils for dinner" }, "correctCategoryId": "needs" },
+    { "id": "chip-video-game", "text": { "en": "A new video game console" }, "correctCategoryId": "wants" },
+    { "id": "chip-vacation", "text": { "en": "A family trip to the hills" }, "correctCategoryId": "wants" },
+    { "id": "chip-branded-shoes", "text": { "en": "A branded pair of sneakers" }, "correctCategoryId": "wants" }
+  ],
+  "explanation": {
+    "en": "A need is something survival and basic well-being depend on - food, water, shelter. A want is something that improves comfort or enjoyment but isn't essential to get by. The same item can shift category with context (a bicycle used to reach the only nearby school is closer to a need than one bought purely for fun), so classify by the situation described, not the object alone."
+  },
+  "hints": [
+    { "en": "Ask: would someone's basic survival or health be at risk without this?" }
+  ],
+  "tags": ["scarcity", "needs-and-wants"],
+  "authoring": {
+    "status": "ai-draft",
+    "flags": [],
+    "reviewedAt": null
+  }
+}
